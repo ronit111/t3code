@@ -159,6 +159,13 @@ describe("command permissions", () => {
     { method: WS_METHODS.workspaceAddTaskFolderRepository, scope: AuthSourceControlWriteScope },
     { method: WS_METHODS.providerMcpSignInStart, scope: AuthProvidersManageScope },
     { method: WS_METHODS.providerMcpSignInComplete, scope: AuthProvidersManageScope },
+    { method: WS_METHODS.claudeConnectorsAdd, scope: AuthProvidersManageScope },
+    { method: WS_METHODS.claudeConnectorsRemove, scope: AuthProvidersManageScope },
+    { method: WS_METHODS.claudeConnectorsSetAccountConnectors, scope: AuthProvidersManageScope },
+    { method: WS_METHODS.claudeConnectorsSignInStart, scope: AuthProvidersManageScope },
+    { method: WS_METHODS.claudeConnectorsSignInComplete, scope: AuthProvidersManageScope },
+    { method: WS_METHODS.claudeConnectorsSignInCancel, scope: AuthProvidersManageScope },
+    { method: WS_METHODS.claudeConnectorsSignOut, scope: AuthProvidersManageScope },
   ])("requires the destination $scope grant for $method", ({ method, scope }) =>
     Effect.gen(function* () {
       const registry = yield* setup;

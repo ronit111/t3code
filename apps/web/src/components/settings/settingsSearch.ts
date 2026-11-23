@@ -28,6 +28,7 @@ export type SettingsPath =
   | "/settings/keybindings"
   | "/settings/snap-shot"
   | "/settings/providers"
+  | "/settings/connectors"
   | "/settings/threads"
   | "/settings/browser"
   | "/settings/devices"
@@ -106,6 +107,7 @@ export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
   "/settings/keybindings": msg("Keybindings"),
   "/settings/snap-shot": msg("SnapShots"),
   "/settings/providers": msg("Providers"),
+  "/settings/connectors": msg("Connectors"),
   "/settings/threads": msg("Threads"),
   "/settings/browser": msg("Browser"),
   "/settings/devices": msg("Devices"),
@@ -156,6 +158,7 @@ const ALL_SETTINGS_NAV_GROUPS: ReadonlyArray<SettingsNavGroup> = [
     heading: msg("Agents"),
     paths: [
       "/settings/providers",
+      "/settings/connectors",
       "/settings/threads",
       "/settings/browser",
       "/settings/devices",
@@ -1079,6 +1082,13 @@ export const SETTINGS_SEARCH_ITEMS = [
     ],
   },
   {
+    id: "connectors",
+    title: msg("Connectors"),
+    to: "/settings/connectors",
+    searchTerms: [msg("mcp connectors servers tools claude oauth")],
+    providerSettingsOnly: true,
+  },
+  {
     id: "usage-providers",
     title: msg("Usage providers"),
     to: "/settings/providers",
@@ -1527,6 +1537,7 @@ const SETTINGS_CATEGORY_SCOPES: Readonly<Record<SettingsPath, SettingsSearchScop
   "/settings/snap-shot": null,
   "/settings/keybindings": null,
   "/settings/providers": null,
+  "/settings/connectors": null,
   "/settings/threads": null,
   "/settings/browser": null,
   "/settings/devices": null,
