@@ -13,6 +13,7 @@ import * as ElectronApp from "../electron/ElectronApp.ts";
 import * as ElectronDialog from "../electron/ElectronDialog.ts";
 import * as ElectronMenu from "../electron/ElectronMenu.ts";
 import * as DesktopEnvironment from "../app/DesktopEnvironment.ts";
+import { DesktopProfileSwitch } from "../profiles/ProfileContract.ts";
 import { applyLanguage, m, onLocaleChange } from "../i18n/messages.ts";
 import * as DesktopClientSettings from "../settings/DesktopClientSettings.ts";
 import * as DesktopUpdates from "../updates/DesktopUpdates.ts";
@@ -186,6 +187,7 @@ export const make = Effect.gen(function* () {
   const electronMenu = yield* ElectronMenu.ElectronMenu;
   const environment = yield* DesktopEnvironment.DesktopEnvironment;
   const electronApp = yield* ElectronApp.ElectronApp;
+  const profileSwitch = yield* DesktopProfileSwitch;
   const clientSettings = yield* Effect.serviceOption(DesktopClientSettings.DesktopClientSettings);
   const context = yield* Effect.context<DesktopApplicationMenuRuntimeServices>();
   const runPromise = Effect.runPromiseWith(context);
@@ -213,6 +215,9 @@ export const make = Effect.gen(function* () {
     };
     const settingsClick = () => {
       runMenuEffect("open-settings", dispatchMenuAction("open-settings"));
+    };
+    const switchProfileClick = () => {
+      runMenuEffect("switch-profile", profileSwitch.switchToPicker);
     };
     // Chromium and the renderer already handle this chord; injecting another paste duplicates text.
     const pasteAsTextClick = (
@@ -246,6 +251,9 @@ export const make = Effect.gen(function* () {
             accelerator: "CmdOrCtrl+,",
             click: settingsClick,
           },
+          ...(profileSwitch.active.profilesRoot === null
+            ? []
+            : [{ label: m(msg("Switch Profile...")), click: switchProfileClick }]),
           { type: "separator" },
           { role: "services", label: m(msg("Services", { $context: "macOS app menu item" })) },
           { type: "separator" },

@@ -4,6 +4,7 @@ import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
+import * as Ref from "effect/Ref";
 
 import type { DesktopUpdateCheckResult, DesktopUpdateState } from "@t3tools/contracts";
 import * as Electron from "electron";
@@ -19,6 +20,7 @@ import * as ElectronMenu from "../electron/ElectronMenu.ts";
 import * as DesktopApplicationMenu from "./DesktopApplicationMenu.ts";
 import * as DesktopConfig from "../app/DesktopConfig.ts";
 import * as DesktopEnvironment from "../app/DesktopEnvironment.ts";
+import { DesktopProfileSwitch, type ProfileId } from "../profiles/ProfileContract.ts";
 import * as DesktopUpdates from "../updates/DesktopUpdates.ts";
 import { createInitialDesktopUpdateState } from "../updates/updateMachine.ts";
 import * as DesktopWindow from "./DesktopWindow.ts";
@@ -62,7 +64,23 @@ const layerElectronApp = Layer.succeed(ElectronApp.ElectronApp, {
 interface MenuServices {
   readonly checkResult?: DesktopUpdateCheckResult;
   readonly shownMessageBox?: Deferred.Deferred<Electron.MessageBoxOptions>;
+  readonly profilesRoot?: string | null;
+  readonly profileSwitches?: Ref.Ref<number>;
 }
+
+const layerProfileSwitch = ({ profilesRoot = null, profileSwitches }: MenuServices) =>
+  Layer.succeed(DesktopProfileSwitch, {
+    active: {
+      id: "default" as ProfileId,
+      name: null,
+      isDefault: true,
+      profilesRoot,
+      registryExists: false,
+    },
+    switchToPicker: profileSwitches
+      ? Ref.update(profileSwitches, (n) => n + 1).pipe(Effect.as(true))
+      : Effect.die("unexpected switchToPicker"),
+  });
 
 const layerElectronDialog = ({ shownMessageBox }: MenuServices) =>
   Layer.succeed(ElectronDialog.ElectronDialog, {
@@ -138,6 +156,7 @@ const configureMenu = (
         Layer.provideMerge(layerDesktopWindow(selectedAction)),
         Layer.provideMerge(layerDesktopUpdates(services)),
         Layer.provideMerge(layerElectronDialog(services)),
+        Layer.provideMerge(layerProfileSwitch(services)),
         Layer.provideMerge(layerElectronApp),
         Layer.provideMerge(
           DesktopEnvironment.layer({ ...environmentInput, ...environment }).pipe(
@@ -366,6 +385,51 @@ describe("DesktopApplicationMenu", () => {
         downloadPercent: 100,
       });
       assert.include(`${dialog.title ?? ""} ${dialog.message} ${dialog.detail ?? ""}`, "0.1.7");
+    }),
+  );
+
+  it.effect("offers Switch Profile after Settings only when profiles are on", () =>
+    Effect.gen(function* () {
+      const appMenuLabels = (template: readonly Electron.MenuItemConstructorOptions[]) =>
+        template.flatMap((item) =>
+          Array.isArray(item.submenu) ? item.submenu.map((entry) => entry.label) : [],
+        );
+      const profileSwitches = yield* Ref.make(0);
+      const cases = [
+        { platform: "darwin", profilesRoot: "/Users/alice/.t3-profiles", shown: true },
+        { platform: "darwin", profilesRoot: null, shown: false },
+        { platform: "linux", profilesRoot: null, shown: false },
+        { platform: "win32", profilesRoot: null, shown: false },
+      ] as const;
+      for (const { platform, profilesRoot, shown } of cases) {
+        const applicationMenuTemplate =
+          yield* Deferred.make<readonly Electron.MenuItemConstructorOptions[]>();
+        yield* configureMenu(
+          yield* Deferred.make<string>(),
+          applicationMenuTemplate,
+          { platform },
+          { profilesRoot, profileSwitches },
+        );
+        const template = yield* Deferred.await(applicationMenuTemplate);
+        const labels = appMenuLabels(template);
+        assert.strictEqual(
+          labels.includes("Switch Profile..."),
+          shown,
+          `${platform} ${profilesRoot}`,
+        );
+        if (!shown) continue;
+        assert.strictEqual(labels.indexOf("Switch Profile..."), labels.indexOf("Settings...") + 1);
+        const appMenu = template[0];
+        const item = Array.isArray(appMenu?.submenu)
+          ? appMenu.submenu.find((entry) => entry.label === "Switch Profile...")
+          : undefined;
+        if (typeof item?.click !== "function") {
+          throw new Error("Expected Switch Profile... to have a click handler.");
+        }
+        // The double completes synchronously, so the switch has run when click returns.
+        item.click({} as Electron.MenuItem, {} as Electron.BrowserWindow, {} as KeyboardEvent);
+      }
+      assert.strictEqual(yield* Ref.get(profileSwitches), 1);
     }),
   );
 
