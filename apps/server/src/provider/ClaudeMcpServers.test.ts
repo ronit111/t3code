@@ -31,6 +31,7 @@ interface SpawnedCommand {
   readonly args: ReadonlyArray<string>;
   readonly cwd: string | undefined;
   readonly env: NodeJS.ProcessEnv | undefined;
+  readonly stdin: Array<string>;
 }
 
 const makeSpawner = (calls: Array<SpawnedCommand>, exitCode = 0) =>
@@ -41,11 +42,13 @@ const makeSpawner = (calls: Array<SpawnedCommand>, exitCode = 0) =>
         readonly args: ReadonlyArray<string>;
         readonly options: { readonly cwd?: string; readonly env?: NodeJS.ProcessEnv };
       };
+      const stdin: Array<string> = [];
       calls.push({
         command: command.command,
         args: command.args,
         cwd: command.options.cwd,
         env: command.options.env,
+        stdin,
       });
       return ChildProcessSpawner.makeHandle({
         pid: ChildProcessSpawner.ProcessId(1),
@@ -53,7 +56,9 @@ const makeSpawner = (calls: Array<SpawnedCommand>, exitCode = 0) =>
         isRunning: Effect.succeed(false),
         kill: () => Effect.void,
         unref: Effect.succeed(Effect.void),
-        stdin: Sink.drain,
+        stdin: Sink.forEach((chunk: Uint8Array) =>
+          Effect.sync(() => stdin.push(new TextDecoder().decode(chunk))),
+        ),
         stdout: Stream.empty,
         stderr: Stream.empty,
         all: Stream.empty,
@@ -352,37 +357,28 @@ describe("ClaudeMcpServers writes", () => {
           ]),
         ),
       ).pipe(Effect.provide(context));
-      expect(calls.map(({ command, args }) => ({ command, args }))).toEqual([
+      // Secrets go over stdin: any local user can read another process's argv.
+      expect(
+        calls.map(({ command, args, stdin }) => ({ command, args, stdin: stdin.join("") })),
+      ).toEqual([
         {
           command: "/opt/claude/bin/claude",
-          args: [
-            "mcp",
-            "add-json",
-            "local",
-            JSON.stringify({
-              type: "stdio",
-              command: "npx",
-              args: ["-y", "server"],
-              env: { API_KEY: "k" },
-            }),
-            "--scope",
-            "user",
-          ],
+          args: ["mcp", "add-json", "local", "-", "--scope", "user"],
+          stdin: JSON.stringify({
+            type: "stdio",
+            command: "npx",
+            args: ["-y", "server"],
+            env: { API_KEY: "k" },
+          }),
         },
         {
           command: "/opt/claude/bin/claude",
-          args: [
-            "mcp",
-            "add-json",
-            "web",
-            JSON.stringify({
-              type: "http",
-              url: "https://mcp.example.com/mcp",
-              headers: { Authorization: "Bearer t" },
-            }),
-            "--scope",
-            "user",
-          ],
+          args: ["mcp", "add-json", "web", "-", "--scope", "user"],
+          stdin: JSON.stringify({
+            type: "http",
+            url: "https://mcp.example.com/mcp",
+            headers: { Authorization: "Bearer t" },
+          }),
         },
       ]);
       expect(calls[0]?.env?.CLAUDE_CONFIG_DIR).toBe(dir);

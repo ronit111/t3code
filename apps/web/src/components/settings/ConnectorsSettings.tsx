@@ -1,4 +1,9 @@
 import { useAtomValue } from "@effect/atom-react";
+import {
+  isAtomCommandInterrupted,
+  squashAtomCommandFailure,
+  type AtomCommandResult,
+} from "@t3tools/client-runtime/state/runtime";
 import { Link } from "@tanstack/react-router";
 import {
   ProviderInstanceId,
@@ -33,6 +38,16 @@ import { SettingsPageContainer, SettingsRow, SettingsSection } from "./settingsL
 import { useSearchableSetting } from "./settingsSearch";
 
 const DEFAULT_CLAUDE_INSTANCE = ProviderInstanceId.make("claudeAgent");
+
+/** The server's safe detail for a failed command; null on success or when the call was dropped. */
+const failureMessage = (
+  result: AtomCommandResult<unknown, unknown>,
+  fallback: string,
+): string | null => {
+  if (result._tag === "Success" || isAtomCommandInterrupted(result)) return null;
+  const error = squashAtomCommandFailure(result);
+  return error instanceof Error ? error.message : fallback;
+};
 
 /** A Claude instance's own MCP servers, kept in that instance's config directory. */
 export function ConnectorsSettings({
@@ -134,6 +149,7 @@ function InstanceConnectors({
     label: "switch account connectors",
   });
   const [adding, setAdding] = useState(false);
+  const [accountFailure, setAccountFailure] = useState<string | null>(null);
   const title = gt("Connectors");
 
   if (query.data === null && (query.isPending || query.error === null)) {
@@ -175,6 +191,11 @@ function InstanceConnectors({
   }
 
   const state = query.data;
+  const switchAccountConnectors = async (enabled: boolean) => {
+    setAccountFailure(null);
+    const result = await setAccountConnectors({ environmentId, input: { instanceId, enabled } });
+    setAccountFailure(failureMessage(result, gt("The request failed.")));
+  };
   return (
     <>
       <SettingsSection
@@ -206,15 +227,11 @@ function InstanceConnectors({
             <Switch
               checked={state.accountConnectorsEnabled}
               disabled={!canEdit || query.isPending}
-              onCheckedChange={(checked) =>
-                void setAccountConnectors({
-                  environmentId,
-                  input: { instanceId, enabled: Boolean(checked) },
-                })
-              }
+              onCheckedChange={(checked) => void switchAccountConnectors(Boolean(checked))}
               aria-label={gt("Account connectors (claude.ai)")}
             />
           }
+          status={accountFailure ? <FailureText>{accountFailure}</FailureText> : null}
         />
         {state.servers.length === 0 ? (
           <p className="px-4 py-3 text-sm text-muted-foreground">
@@ -268,11 +285,14 @@ function ConnectorRow({
   const [confirmingRemove, setConfirmingRemove] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
   const target = { environmentId, input: { instanceId, name: server.name } };
-  const run = async (action: () => Promise<unknown>) => {
+  const run = async (action: () => Promise<AtomCommandResult<unknown, unknown>>) => {
     setBusy(true);
-    await action();
+    setFailure(null);
+    const result = await action();
     setBusy(false);
+    setFailure(failureMessage(result, gt("The request failed.")));
   };
 
   return (
@@ -293,6 +313,7 @@ function ConnectorRow({
           ) : null}
         </span>
       }
+      status={failure ? <FailureText>{failure}</FailureText> : null}
       control={
         canEdit ? (
           <div className="flex items-center gap-1">
@@ -367,6 +388,14 @@ function ConnectorRow({
         ) : null
       }
     />
+  );
+}
+
+function FailureText({ children }: { readonly children: string }) {
+  return (
+    <span role="alert" className="text-destructive-foreground">
+      {children}
+    </span>
   );
 }
 

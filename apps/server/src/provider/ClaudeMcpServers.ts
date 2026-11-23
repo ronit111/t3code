@@ -289,11 +289,13 @@ const make = Effect.gen(function* () {
   const runCli = Effect.fn("ClaudeMcpServers.runCli")(function* (
     instance: ResolvedInstance,
     args: ReadonlyArray<string>,
+    stdin?: string,
   ) {
     const result = yield* runner
       .run({
         command: instance.binary,
         args,
+        stdin,
         cwd: stateDir,
         env: instance.env,
         timeout: CLI_TIMEOUT,
@@ -320,14 +322,12 @@ const make = Effect.gen(function* () {
     const instance = yield* resolve(input.instanceId);
     const servers = yield* readServers(instance);
     if (Object.hasOwn(servers, input.name)) return yield* fail("NameTaken", DETAILS.nameTaken);
-    yield* runCli(instance, [
-      "mcp",
-      "add-json",
-      input.name,
+    // `-` reads the JSON from stdin, keeping env and header secrets out of argv, which `ps` shows.
+    yield* runCli(
+      instance,
+      ["mcp", "add-json", input.name, "-", "--scope", "user"],
       encodeJson(toClaudeJson(input.definition)),
-      "--scope",
-      "user",
-    ]);
+    );
     return yield* readState(instance);
   }, writeLock.withPermits(1));
 
