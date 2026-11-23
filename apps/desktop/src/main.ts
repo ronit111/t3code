@@ -243,13 +243,15 @@ const layerDesktopLocalEnvironmentAuth = DesktopLocalEnvironmentAuth.layer.pipe(
 );
 
 const layerDesktopApplication = Layer.mergeAll(
-  ProfileSwitch.layer.pipe(Layer.provideMerge(DesktopLifecycle.layer)),
+  DesktopLifecycle.layer,
   layerDesktopAppActivation,
   DesktopWebLinks.layer,
   DesktopApplicationMenu.layer,
   DesktopLinuxUrlHandler.layer,
   DesktopCliCommand.layer,
 ).pipe(
+  // The menu captures its services when it is built, so the switch must exist before it.
+  Layer.provideMerge(ProfileSwitch.layer.pipe(Layer.provide(DesktopLifecycle.layer))),
   Layer.provideMerge(layerDesktopSnapShot),
   Layer.provideMerge(
     DesktopUpdates.layer.pipe(
