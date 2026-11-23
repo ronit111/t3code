@@ -12,12 +12,15 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 // @effect-diagnostics-next-line nodeBuiltinImport:off - Version output must flush before Electron exits, without acquiring the runtime.
 import * as NodeFS from "node:fs";
 import * as NodeOS from "node:os";
+// @effect-diagnostics-next-line nodeBuiltinImport:off - The picker bundle is located before any runtime exists.
+import * as NodePath from "node:path";
 import * as SecureRandom from "effect/crypto/SecureRandom";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Layer from "effect/Layer";
 
 import * as Electron from "electron";
+import { msg } from "gt-i18n";
 
 import * as NetService from "@t3tools/shared/Net";
 import * as HostProcess from "@t3tools/shared/HostProcess";
@@ -81,6 +84,14 @@ import * as DesktopWindow from "./window/DesktopWindow.ts";
 import * as DesktopWslBackend from "./wsl/DesktopWslBackend.ts";
 import * as DesktopWslEnvironment from "./wsl/DesktopWslEnvironment.ts";
 import * as DesktopWslServerTree from "./wsl/DesktopWslServerTree.ts";
+import {
+  PROFILE_PICKER_BUNDLE,
+  type PickerLaunch,
+  type RunProfilePicker,
+} from "./profiles/ProfileContract.ts";
+import { m } from "./i18n/messages.ts";
+import * as ProfileLaunch from "./profiles/ProfileLaunch.ts";
+import * as ProfileSwitch from "./profiles/ProfileSwitch.ts";
 
 if (process.argv.includes("--version")) {
   try {
@@ -90,6 +101,26 @@ if (process.argv.includes("--version")) {
   }
   Electron.app.exit(0);
 }
+
+// Before any layer: Clerk sets userData and takes the single-instance lock without yielding.
+// A --version probe must not consume a launch intent meant for the app that is starting.
+const hostEnvironment = HostProcess.Environment.defaultValue();
+const launch = process.argv.includes("--version")
+  ? ProfileLaunch.defaultOpenLaunch({ profilesRoot: null, registryExists: false, name: null })
+  : ProfileLaunch.resolveProfileLaunchSync({
+      argv: HostProcess.Arguments.defaultValue(),
+      env: hostEnvironment,
+      platform: HostProcess.Platform.defaultValue(),
+      homeDirectory: NodeOS.homedir(),
+      // @effect-diagnostics-next-line globalDate:off - Runs before any Effect runtime exists.
+      now: new Date(),
+      isDevelopment: (hostEnvironment.VITE_DEV_SERVER_URL ?? "").trim().length > 0,
+      fs: {
+        exists: (path) => NodeFS.existsSync(path),
+        readFile: (path) => NodeFS.readFileSync(path, "utf8"),
+        unlink: (path) => NodeFS.unlinkSync(path),
+      },
+    });
 
 const layerDesktopEnvironment = Layer.unwrap(
   Effect.gen(function* () {
@@ -104,6 +135,7 @@ const layerDesktopEnvironment = Layer.unwrap(
       platform,
       processArch,
       ...metadata,
+      ...(launch._tag === "Open" ? { profile: launch } : {}),
     });
   }),
 );
@@ -211,7 +243,7 @@ const layerDesktopLocalEnvironmentAuth = DesktopLocalEnvironmentAuth.layer.pipe(
 );
 
 const layerDesktopApplication = Layer.mergeAll(
-  DesktopLifecycle.layer,
+  ProfileSwitch.layer.pipe(Layer.provideMerge(DesktopLifecycle.layer)),
   layerDesktopAppActivation,
   DesktopWebLinks.layer,
   DesktopApplicationMenu.layer,
@@ -256,4 +288,25 @@ const layerDesktopRuntime = layerDesktopClerk.pipe(
   Layer.provideMerge(DesktopPreReadyPlatform.layer),
 );
 
-DesktopApp.program.pipe(Effect.provide(layerDesktopRuntime), NodeRuntime.runMain);
+const runProfilePicker = (pickerLaunch: PickerLaunch) => {
+  let run: RunProfilePicker;
+  try {
+    // A sibling bundle owned by the picker, so the main bundle never links picker code.
+    run = (
+      require(NodePath.join(__dirname, PROFILE_PICKER_BUNDLE)) as {
+        runProfilePicker: RunProfilePicker;
+      }
+    ).runProfilePicker;
+  } catch {
+    Electron.dialog.showErrorBox(
+      "T3 Code",
+      m(msg("The profile picker is missing from this build. Reinstall T3 Code.")),
+    );
+    Electron.app.exit(1);
+    return;
+  }
+  run(pickerLaunch);
+};
+
+if (launch._tag === "Picker") runProfilePicker(launch);
+else DesktopApp.program.pipe(Effect.provide(layerDesktopRuntime), NodeRuntime.runMain);
