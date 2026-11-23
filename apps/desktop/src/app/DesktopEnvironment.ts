@@ -11,6 +11,9 @@ import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
 import * as Path from "effect/Path";
 
+import type { ActiveProfile, OpenLaunch } from "../profiles/ProfileContract.ts";
+import { defaultOpenLaunch } from "../profiles/ProfileLaunch.ts";
+import { resolveAppDataDirectory } from "../profiles/ProfilePaths.ts";
 import * as DesktopAppSettings from "../settings/DesktopAppSettings.ts";
 import * as DesktopConfig from "./DesktopConfig.ts";
 import { resolveLinuxDesktopEntryName } from "./DesktopEarlyElectronStartup.ts";
@@ -28,6 +31,8 @@ export interface MakeDesktopEnvironmentInput {
   readonly isPackaged: boolean;
   readonly resourcesPath: string;
   readonly runningUnderArm64Translation: boolean;
+  /** Absent means the Default profile with today's paths. */
+  readonly profile?: OpenLaunch;
 }
 
 export class DesktopEnvironment extends Context.Service<
@@ -82,6 +87,9 @@ export class DesktopEnvironment extends Context.Service<
     readonly runtimeInfo: DesktopRuntimeInfo;
     readonly resolvePickFolderDefaultPath: (rawOptions: unknown) => Option.Option<string>;
     readonly resolveResourcePathCandidates: (fileName: string) => readonly string[];
+    readonly profile: ActiveProfile;
+    /** Some only for a non-Default profile; Default keeps today's userData resolution. */
+    readonly electronUserDataOverride: Option.Option<string>;
   }
 >()("@t3tools/desktop/app/DesktopEnvironment") {}
 
@@ -148,18 +156,20 @@ const make = Effect.fn("desktop.environment.make")(function* (
   const homeDirectory = input.homeDirectory;
   const devServerUrl = config.devServerUrl;
   const isDevelopment = Option.isSome(devServerUrl);
-  const appDataDirectory =
-    input.platform === "win32"
-      ? Option.getOrElse(config.appDataDirectory, () =>
-          path.join(homeDirectory, "AppData", "Roaming"),
-        )
-      : input.platform === "darwin"
-        ? path.join(homeDirectory, "Library", "Application Support")
-        : Option.getOrElse(config.xdgConfigHome, () => path.join(homeDirectory, ".config"));
+  const appDataDirectory = resolveAppDataDirectory({
+    platform: input.platform,
+    homeDirectory,
+    appData: config.appDataDirectory,
+    xdgConfigHome: config.xdgConfigHome,
+    joinPath: path.join,
+  });
+  const launch =
+    input.profile ?? defaultOpenLaunch({ profilesRoot: null, registryExists: false, name: null });
+  const t3Home = launch.home === null ? config.t3Home : Option.some(launch.home);
   const baseDir = resolveDesktopBaseDir({
     homeDirectory,
     joinPath: path.join,
-    t3Home: config.t3Home,
+    t3Home,
   });
   const rootDir = path.resolve(input.dirname, "../../..");
   const appRoot = input.isPackaged ? input.appPath : rootDir;
@@ -176,7 +186,7 @@ const make = Effect.fn("desktop.environment.make")(function* (
     baseDir,
     isDevelopment,
     joinPath: path.join,
-    t3Home: config.t3Home,
+    t3Home,
   });
   const linuxApplicationsDir = path.join(
     Option.getOrElse(config.xdgDataHome, () => path.join(homeDirectory, ".local", "share")),
@@ -271,6 +281,8 @@ const make = Effect.fn("desktop.environment.make")(function* (
       path.join(resourcesPath, "resources", fileName),
       path.join(resourcesPath, fileName),
     ],
+    profile: launch.profile,
+    electronUserDataOverride: Option.fromNullOr(launch.userDataPath),
   });
 });
 

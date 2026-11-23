@@ -91,6 +91,8 @@ export const make = Effect.gen(function* () {
   const ownedPathMarker = path.join(environment.stateDir, "cli-command-path-entry");
   const firstLaunchMarker = path.join(environment.stateDir, "cli-command-first-launch");
 
+  // ~/.local/bin/t3 belongs to the Default profile; another profile's terminals use <home>/bin/t3.
+  const otherProfile = !environment.profile.isDefault;
   const fail = (message: string) => new DesktopCliCommandError({ message });
   const exists = (target: string) => fs.exists(target).pipe(Effect.orElseSucceed(() => false));
   // Read before this launch writes either one: an app that ran before left its launcher or
@@ -235,7 +237,7 @@ export const make = Effect.gen(function* () {
     );
 
   const state: DesktopCliCommand["Service"]["state"] = Effect.gen(function* () {
-    if (!environment.isPackaged) {
+    if (!environment.isPackaged || otherProfile) {
       return { supported: false, installedPath: null, onPath: false, launcherPath: null } as const;
     }
     const launcherPath = (yield* exists(launcher)) ? launcher : null;
@@ -293,6 +295,7 @@ export const make = Effect.gen(function* () {
   );
 
   const install: DesktopCliCommand["Service"]["install"] = Effect.gen(function* () {
+    if (otherProfile) return yield* state;
     if (!environment.isPackaged) return yield* fail("The t3 command needs an installed app.");
     yield* ensureLauncher;
     if (windows) {
@@ -370,6 +373,7 @@ export const make = Effect.gen(function* () {
   }).pipe(Effect.withSpan("desktop.cliCommand.install"));
 
   const uninstall: DesktopCliCommand["Service"]["uninstall"] = Effect.gen(function* () {
+    if (otherProfile) return yield* state;
     // A first launch put off for the shell PATH must not bring back what the user removed.
     yield* fs.writeFileString(firstLaunchMarker, "").pipe(Effect.ignore);
     if (windows) {
@@ -393,6 +397,7 @@ export const make = Effect.gen(function* () {
   // One at a time, so Settings and onboarding cannot both append the line.
   const addToPathPermit = yield* Semaphore.make(1);
   const addToPath: DesktopCliCommand["Service"]["addToPath"] = Effect.gen(function* () {
+    if (otherProfile) return yield* state;
     const installed = yield* installedAt;
     if (Option.isNone(installed) || !(yield* leadsHere(installed.value))) {
       return yield* fail("Install the t3 command first.");
@@ -418,7 +423,7 @@ export const make = Effect.gen(function* () {
 
   const installOnFirstLaunch: DesktopCliCommand["Service"]["installOnFirstLaunch"] = Effect.gen(
     function* () {
-      if (!environment.isPackaged || (yield* exists(firstLaunchMarker))) return;
+      if (otherProfile || !environment.isPackaged || (yield* exists(firstLaunchMarker))) return;
       // Mark first so a failed or removed install is never retried behind the user's back.
       yield* fs.writeFileString(firstLaunchMarker, "");
       if (!freshInstall) {

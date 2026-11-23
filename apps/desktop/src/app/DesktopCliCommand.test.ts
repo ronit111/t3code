@@ -15,7 +15,13 @@ import * as DesktopEnvironment from "./DesktopEnvironment.ts";
 
 const environmentFor = (
   path: Path.Path,
-  input: { home: string; baseDir: string; platform?: NodeJS.Platform; isPackaged?: boolean },
+  input: {
+    home: string;
+    baseDir: string;
+    platform?: NodeJS.Platform;
+    isPackaged?: boolean;
+    isDefaultProfile?: boolean;
+  },
 ) =>
   DesktopEnvironment.DesktopEnvironment.of({
     path,
@@ -27,6 +33,7 @@ const environmentFor = (
     desktopSettingsPath: path.join(input.baseDir, "userdata", "desktop-settings.json"),
     serverRoot: "/opt/T3 Code/resources/app.asar",
     appImagePath: Option.none(),
+    profile: { isDefault: input.isDefaultProfile ?? true },
   } as unknown as DesktopEnvironment.DesktopEnvironment["Service"]);
 
 const commandIn = (
@@ -35,6 +42,7 @@ const commandIn = (
     baseDir?: string;
     platform?: NodeJS.Platform;
     isPackaged?: boolean;
+    isDefaultProfile?: boolean;
     env?: NodeJS.ProcessEnv;
   },
   spawner?: ChildProcessSpawner.ChildProcessSpawner["Service"],
@@ -441,6 +449,31 @@ it.layer(NodeServices.layer)("DesktopCliCommand", (it) => {
       yield* (yield* commandIn({ home: besideHome, platform: "win32" }, beside.spawner))
         .installOnFirstLaunch;
       expect(beside.registry).toMatchObject({ path: "C:\\Tools", writes: 0 });
+    }),
+  );
+
+  it.effect("leaves the shared t3 command alone in a non-Default profile", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const home = yield* fs.makeTempDirectoryScoped();
+      const baseDir = path.join(home, ".t3-profiles", "pa1b2c3d4e5");
+      const command = yield* commandIn({ home, baseDir, isDefaultProfile: false });
+      const unsupported = {
+        supported: false,
+        installedPath: null,
+        onPath: false,
+        launcherPath: null,
+      };
+
+      expect(yield* command.state).toEqual(unsupported);
+      yield* command.installOnFirstLaunch;
+      expect(yield* command.install).toEqual(unsupported);
+      expect(yield* command.addToPath).toEqual(unsupported);
+      expect(yield* fs.exists(path.join(home, ".local", "bin", "t3"))).toBe(false);
+      expect(yield* fs.exists(path.join(baseDir, "userdata", "cli-command-first-launch"))).toBe(
+        false,
+      );
     }),
   );
 });

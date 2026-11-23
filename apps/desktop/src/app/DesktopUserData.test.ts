@@ -2,6 +2,8 @@ import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, it } from "@effect/vitest";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
+import * as Layer from "effect/Layer";
+import * as Option from "effect/Option";
 import * as Path from "effect/Path";
 import * as PlatformError from "effect/PlatformError";
 
@@ -136,5 +138,63 @@ it.effect("retries on the next launch when a GPU cache cannot be removed", () =>
     );
 
     assert.deepStrictEqual(writes, []);
+  }).pipe(Effect.provide(NodeServices.layer)),
+);
+
+const recordingFileSystem = (existing: ReadonlySet<string>) => {
+  const calls: Array<string> = [];
+  const layer = Layer.succeed(
+    FileSystem.FileSystem,
+    FileSystem.makeNoop({
+      exists: (path) =>
+        Effect.sync(() => {
+          calls.push(path);
+          return existing.has(path);
+        }),
+    }),
+  );
+  return { calls, layer };
+};
+
+it.effect.each([
+  { name: "packaged", isDevelopment: false, legacy: false, expected: "/appData/t3code-v2" },
+  { name: "dev", isDevelopment: true, legacy: false, expected: "/appData/t3code-dev" },
+  {
+    name: "dev with the legacy folder",
+    isDevelopment: true,
+    legacy: true,
+    expected: "/appData/T3 Code (Dev)",
+  },
+])("the Default profile keeps today's userData: $name", ({ isDevelopment, legacy, expected }) =>
+  Effect.gen(function* () {
+    const existing = new Set(legacy ? ["/appData/T3 Code (Dev)"] : []);
+    const input = { appDataDirectory: "/appData", isDevelopment, platform: "darwin" as const };
+    const absent = recordingFileSystem(existing);
+    const none = recordingFileSystem(existing);
+    assert.equal(yield* resolveUserDataPath(input).pipe(Effect.provide(absent.layer)), expected);
+    assert.equal(
+      yield* resolveUserDataPath({ ...input, electronUserDataOverride: Option.none() }).pipe(
+        Effect.provide(none.layer),
+      ),
+      expected,
+    );
+    assert.deepEqual(none.calls, absent.calls);
+  }).pipe(Effect.provide(NodeServices.layer)),
+);
+
+it.effect("another profile's userData override skips every lookup", () =>
+  Effect.gen(function* () {
+    const recording = recordingFileSystem(new Set());
+    const override = "/appData/t3code-v2-profile-pa1b2c3d4e5";
+    assert.equal(
+      yield* resolveUserDataPath({
+        appDataDirectory: "/appData",
+        isDevelopment: true,
+        platform: "win32",
+        electronUserDataOverride: Option.some(override),
+      }).pipe(Effect.provide(recording.layer)),
+      override,
+    );
+    assert.deepEqual(recording.calls, []);
   }).pipe(Effect.provide(NodeServices.layer)),
 );
