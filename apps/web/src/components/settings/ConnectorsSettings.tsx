@@ -136,7 +136,7 @@ function InstanceConnectors({
   const [adding, setAdding] = useState(false);
   const title = gt("Connectors");
 
-  if (query.data === null && query.isPending) {
+  if (query.data === null && (query.isPending || query.error === null)) {
     return (
       <SettingsSection id={sectionId} title={title} headerAction={instancePicker}>
         <div className="grid gap-3 px-4 py-3">
@@ -148,9 +148,10 @@ function InstanceConnectors({
   }
 
   if (query.data === null) {
-    const failure = query.failure as { readonly _tag?: string } | null;
+    // A server without these methods answers with a defect, so no typed failure arrives.
+    const failure = query.failure;
     const description =
-      failure?._tag === "EnvironmentAuthorizationError"
+      failure !== null && "_tag" in failure && failure._tag === "EnvironmentAuthorizationError"
         ? gt(
             "You need permission to manage providers on {label} to see and change its connectors.",
             { label: environmentLabel },
