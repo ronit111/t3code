@@ -309,7 +309,14 @@ const make = Effect.gen(function* () {
             : fail("CliFailed", DETAILS.cliFailed),
         ),
       );
-    if (result.code !== 0) return yield* fail("CliFailed", DETAILS.cliFailed);
+    if (result.code !== 0) {
+      yield* Effect.logWarning("claude mcp exited with an error", {
+        args: args.slice(0, 2),
+        code: result.code,
+        stderr: result.stderr.slice(-2000),
+      });
+      return yield* fail("CliFailed", DETAILS.cliFailed);
+    }
   });
 
   const list = Effect.fn("ClaudeMcpServers.list")(function* (input: {
