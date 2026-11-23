@@ -24,7 +24,7 @@ import {
 } from "./ProfileContract.ts";
 import { writeLaunchIntent } from "./ProfileLaunch.ts";
 import { hashPassword, verifyPassword } from "./ProfileLock.ts";
-import { profileHome, profileUserDataPath } from "./ProfilePaths.ts";
+import { profileHome, profileUserDataPath, seededSettingsPath } from "./ProfilePaths.ts";
 import {
   adoptOrphanProfiles,
   emptyRegistry,
@@ -289,6 +289,16 @@ const make = Effect.fn("DesktopProfiles.makeProfileService")(function* (
       const loaded = yield* load;
       const entry = yield* findEntry(loaded.registry, request.id);
       yield* requireUnlocked(entry, request.password);
+      if (entry.id !== DEFAULT_PROFILE_ID) {
+        const settings = seededSettingsPath(profileHome(root, entry.id, path.join), path.join);
+        if (!(yield* fs.exists(settings).pipe(Effect.orElseSucceed(() => false)))) {
+          return yield* profileError(
+            "NotFound",
+            m(msg("This profile's folder is missing, so T3 Code can't open it.")),
+            entry.id,
+          );
+        }
+      }
       // Opening Default from a picker reached with Default alone must not create the registry.
       if (loaded.exists) {
         yield* provide(writeRegistry(root, { ...loaded.registry, lastUsedProfileId: entry.id }));

@@ -83,8 +83,13 @@ const resolve = (
 const openedId = (launch: ProfileLaunch) =>
   launch._tag === "Open" ? launch.profile.id : `picker:${launch.unlockProfileId ?? ""}`;
 
-const twoProfiles = { [REGISTRY]: registry([{ id: "default" }, { id: P1 }]) };
-const lockedP1 = { [REGISTRY]: registry([{ id: "default" }, { id: P1, lock: LOCK }]) };
+const seeded = (...ids: ReadonlyArray<string>) =>
+  Object.fromEntries(ids.map((id) => [`${ROOT}/${id}/userdata/settings.json`, "{}"]));
+const twoProfiles = { [REGISTRY]: registry([{ id: "default" }, { id: P1 }]), ...seeded(P1) };
+const lockedP1 = {
+  [REGISTRY]: registry([{ id: "default" }, { id: P1, lock: LOCK }]),
+  ...seeded(P1),
+};
 
 describe("resolveProfileLaunchSync", () => {
   it.each([
@@ -152,6 +157,7 @@ describe("resolveProfileLaunchSync", () => {
       step: "7: an intent for another locked profile beats the argument and asks for its password",
       files: {
         [REGISTRY]: registry([{ id: "default" }, { id: P1, lock: LOCK }, { id: P2, lock: LOCK }]),
+        ...seeded(P1, P2),
         [INTENT]: intent({ kind: "profile", profileId: P2, unlocked: false }),
       },
       overrides: { argv: ["app", `--t3-profile=${P1}`] },
@@ -218,11 +224,16 @@ describe("resolveProfileLaunchSync", () => {
     }
   });
 
-  it("step 6: an unknown id opens the picker with ProfileNotFound", () => {
-    const { launch } = resolve(twoProfiles, { argv: ["app", "--t3-profile=pzzzzzzzzzz"] });
-    assert.equal(launch._tag, "Picker");
-    if (launch._tag !== "Picker") return;
-    assert.deepEqual(launch.notice, { _tag: "ProfileNotFound", requestedId: "pzzzzzzzzzz" });
+  it("step 6: an unknown id, or one whose home is gone, opens the picker with ProfileNotFound", () => {
+    for (const [files, requestedId] of [
+      [twoProfiles, "pzzzzzzzzzz"],
+      [{ [REGISTRY]: twoProfiles[REGISTRY] }, P1],
+    ] as const) {
+      const { launch } = resolve(files, { argv: ["app", `--t3-profile=${requestedId}`] });
+      assert.equal(launch._tag, "Picker");
+      if (launch._tag !== "Picker") return;
+      assert.deepEqual(launch.notice, { _tag: "ProfileNotFound", requestedId });
+    }
   });
 
   it("step 3: a corrupt registry opens the picker even when an argument names Default", () => {
@@ -294,7 +305,10 @@ describe("resolveProfileLaunchSync", () => {
   it("honours T3CODE_PROFILES_HOME, in development too", () => {
     const root = "/worktree/.t3/profiles-test";
     const { launch } = resolve(
-      { [`${root}/profiles.json`]: registry([{ id: "default" }, { id: P1 }]) },
+      {
+        [`${root}/profiles.json`]: registry([{ id: "default" }, { id: P1 }]),
+        [`${root}/${P1}/userdata/settings.json`]: "{}",
+      },
       {
         isDevelopment: true,
         env: { T3CODE_PROFILES_HOME: root },

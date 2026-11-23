@@ -70,6 +70,7 @@
   "3240167f7c1595b5": "T3 Code could not move the profile to the Trash.",
   "109046647581beae": "The Default profile can't be moved to the Trash.",
   "117c730a78a10fb1": "This profile is open. Quit it first, then try again.",
+  "6b3b8d54b1950fff": "This profile's folder is missing, so T3 Code can't open it.",
   "5f6b3be453c977fb": "T3 Code could not open this profile.",
   "b1a39cb396dd4235": "Switch profile?",
   "67a41347c66daa8d": "T3 Code restarts and opens the profile picker. Agents that are running stop.",

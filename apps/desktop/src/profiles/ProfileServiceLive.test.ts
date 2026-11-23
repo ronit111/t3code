@@ -255,6 +255,20 @@ describe("ProfileServiceLive", () => {
     ),
   );
 
+  it.effect("open refuses a profile whose home is gone and does not relaunch", () =>
+    withService((service, harness) =>
+      Effect.gen(function* () {
+        const fs = yield* FileSystem.FileSystem;
+        const profile = yield* service.create({ name: "Work", password: null });
+        yield* fs.remove(`${harness.root}/${profile.id}`, { recursive: true });
+        assert.equal(yield* reasonOf(service.open({ id: profile.id, password: null })), "NotFound");
+        assert.equal(harness.relaunches.count, 0);
+        assert.isFalse(yield* fs.exists(`${harness.root}/launch-intent.json`));
+        assert.isUndefined((yield* readJson(`${harness.root}/profiles.json`)).lastUsedProfileId);
+      }),
+    ),
+  );
+
   it.effect("opening Default with Default alone writes the intent but no registry", () =>
     withService((service, harness) =>
       Effect.gen(function* () {

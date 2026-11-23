@@ -63,6 +63,10 @@ export const launchIntentPath = (profilesRoot: string, joinPath: JoinPath): stri
 export const profileHome = (profilesRoot: string, id: string, joinPath: JoinPath): string =>
   joinPath(profilesRoot, id);
 
+/** The server settings seeding writes; its provider homes keep a profile off the shared ones. */
+export const seededSettingsPath = (home: string, joinPath: JoinPath): string =>
+  joinPath(home, "userdata", "settings.json");
+
 export const profileMirrorPath = (profilesRoot: string, id: string, joinPath: JoinPath): string =>
   joinPath(profilesRoot, id, PROFILE_MIRROR_FILE_NAME);
 

@@ -26,6 +26,7 @@ import {
   resolveAppDataDirectory,
   resolveDefaultHome,
   resolveProfilesRoot,
+  seededSettingsPath,
 } from "./ProfilePaths.ts";
 import {
   decodeRegistryText,
@@ -219,7 +220,12 @@ export const resolveProfileLaunchSync = (input: ResolveProfileLaunchInput): Prof
   if (target.kind === "picker") return picker({ _tag: "None" });
 
   const entry = registry.profiles.find((candidate) => candidate.id === target.profileId);
-  if (entry === undefined) {
+  // Without its seeded settings a profile's server would fall back to the shared provider homes.
+  if (
+    entry === undefined ||
+    (entry.id !== DEFAULT_PROFILE_ID &&
+      !input.fs.exists(seededSettingsPath(profileHome(profilesRoot, entry.id, joinPath), joinPath)))
+  ) {
     return picker({ _tag: "ProfileNotFound", requestedId: target.profileId });
   }
   const unlockedByIntent = Option.exists(

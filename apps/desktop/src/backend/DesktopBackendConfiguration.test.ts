@@ -10,6 +10,7 @@ import * as Layer from "effect/Layer";
 import * as ManagedRuntime from "effect/ManagedRuntime";
 import * as Option from "effect/Option";
 import * as Path from "effect/Path";
+import * as Schema from "effect/Schema";
 import * as Stream from "effect/Stream";
 import { ChildProcessSpawner } from "effect/process";
 
@@ -23,6 +24,9 @@ import * as DesktopState from "../app/DesktopState.ts";
 import * as DesktopAppSettings from "../settings/DesktopAppSettings.ts";
 import * as DesktopWslEnvironment from "../wsl/DesktopWslEnvironment.ts";
 import * as DesktopWslServerTree from "../wsl/DesktopWslServerTree.ts";
+import { ProfileId, type OpenLaunch } from "../profiles/ProfileContract.ts";
+
+const PROFILE_ID = Schema.decodeSync(ProfileId)("p0123456789");
 
 const layerShellEnvironment = (prepared = true) =>
   Layer.succeed(DesktopShellEnvironment.DesktopShellEnvironment, {
@@ -68,6 +72,7 @@ function layerEnvironment(
     readonly otlpTracesUrl?: string;
     readonly otlpMetricsUrl?: string;
     readonly otlpLogsUrl?: string;
+    readonly profile?: OpenLaunch;
   },
 ) {
   return DesktopEnvironment.layer({
@@ -80,6 +85,7 @@ function layerEnvironment(
     isPackaged: options?.isPackaged ?? true,
     resourcesPath: options?.resourcesPath ?? "/missing/resources",
     runningUnderArm64Translation: false,
+    ...(options?.profile === undefined ? {} : { profile: options.profile }),
   }).pipe(
     Layer.provide(
       Layer.mergeAll(
@@ -272,6 +278,50 @@ describe("DesktopBackendConfiguration", () => {
         );
       }),
     ),
+  );
+
+  it.effect("resolvePrimary points an inherited T3CODE_HOME at a non-Default profile's home", () =>
+    Effect.gen(function* () {
+      const fileSystem = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const baseDir = yield* fileSystem.makeTempDirectoryScoped({
+        prefix: "t3-desktop-backend-config-test-",
+      });
+      const id = PROFILE_ID;
+      const profilesRoot = path.join(baseDir, "profiles");
+      const profileHome = path.join(profilesRoot, id);
+      const resolveWith = (profile: OpenLaunch | undefined) =>
+        Effect.gen(function* () {
+          const environment = yield* DesktopEnvironment.DesktopEnvironment;
+          const configuration = yield* DesktopBackendConfiguration.DesktopBackendConfiguration;
+          return { environment, config: yield* configuration.resolvePrimary };
+        }).pipe(
+          Effect.provide(
+            layerBackendConfiguration().pipe(
+              Layer.provideMerge(layerServerExposure),
+              Layer.provideMerge(DesktopAppSettings.layerTest()),
+              Layer.provideMerge(DesktopWslEnvironment.layerTest()),
+              Layer.provideMerge(DesktopWslServerTree.layerTest()),
+              Layer.provideMerge(
+                layerEnvironment(baseDir, profile === undefined ? {} : { profile }),
+              ),
+            ),
+          ),
+        );
+
+      const other = yield* resolveWith({
+        _tag: "Open",
+        profile: { id, name: "Work", isDefault: false, profilesRoot, registryExists: true },
+        home: profileHome,
+        userDataPath: path.join(baseDir, "userData"),
+      });
+      assert.equal(other.environment.baseDir, profileHome);
+      assert.equal(other.config.bootstrap.t3Home, profileHome);
+      assert.equal(other.config.env.T3CODE_HOME, profileHome);
+
+      const fallback = yield* resolveWith(undefined);
+      assert.isFalse(Object.hasOwn(fallback.config.env, "T3CODE_HOME"));
+    }).pipe(Effect.scoped, Effect.provide(Layer.mergeAll(NodeServices.layer, NodeCrypto.layer))),
   );
 
   it.effect("resolvePrimary starts from server.asar without materializing the WSL tree", () =>

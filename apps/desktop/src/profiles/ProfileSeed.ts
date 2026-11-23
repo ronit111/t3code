@@ -4,7 +4,7 @@ import * as Path from "effect/Path";
 import { msg } from "gt-i18n";
 
 import { m } from "../i18n/messages.ts";
-import { profileHome } from "./ProfilePaths.ts";
+import { profileHome, seededSettingsPath } from "./ProfilePaths.ts";
 import {
   ioError,
   PRIVATE_DIRECTORY_MODE,
@@ -55,7 +55,7 @@ export const seedProfileHome = Effect.fn("DesktopProfiles.seedProfileHome")(func
       .pipe(Effect.mapError(failed));
   }
   yield* writeFileAtomic(
-    path.join(home, "userdata", "settings.json"),
+    seededSettingsPath(home, path.join),
     toJson(seededServerSettings(home, path.join)),
   ).pipe(Effect.mapError(failed));
   yield* writeFileAtomic(
