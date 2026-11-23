@@ -156,6 +156,8 @@ export const RPC_REQUIRED_SCOPES = {
   [WS_METHODS.issuesCandidates]: AuthOrchestrationReadScope,
   [WS_METHODS.issuesLinkedThreads]: AuthOrchestrationReadScope,
   [WS_METHODS.issueTrackersList]: AuthOrchestrationReadScope,
+  // Shows commands and URLs of servers that hold credentials; read through a query, so unguarded.
+  [WS_METHODS.claudeConnectorsList]: AuthProvidersManageScope,
   [WS_METHODS.issueTrackersConnect]: AuthSettingsWriteScope,
   [WS_METHODS.issueTrackersBindProject]: AuthSettingsWriteScope,
   [WS_METHODS.pullRequestsPreview]: AuthOrchestrationReadScope,

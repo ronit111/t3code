@@ -5,6 +5,7 @@ import {
   AuthProvidersManageScope,
   AuthSettingsWriteScope,
   AuthAccessWriteScope,
+  CLIENT_GUARDED_RPC_SCOPES,
   DEFAULT_SERVER_SETTINGS,
   EnvironmentId,
   ProviderDriverKind,
@@ -95,6 +96,17 @@ describe("RPC authorization scopes", () => {
     expect(requiredScopeForRpcMethod(WS_METHODS.workspaceAddTaskFolderRepository)).toBe(
       AuthSourceControlWriteScope,
     );
+  });
+
+  it("keeps every connector method, list included, behind providers:manage", () => {
+    const methods = Object.values(WS_METHODS).filter((method) =>
+      method.startsWith("claudeConnectors."),
+    );
+    expect(methods).toHaveLength(8);
+    for (const method of methods) {
+      expect(requiredScopeForRpcMethod(method)).toBe(AuthProvidersManageScope);
+    }
+    expect(Object.hasOwn(CLIENT_GUARDED_RPC_SCOPES, WS_METHODS.claudeConnectorsList)).toBe(false);
   });
 
   it("still lets readers load settings the way installed Swift clients ask", () => {
