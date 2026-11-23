@@ -353,6 +353,13 @@ export const DesktopCliCommandStateSchema = Schema.Struct({
 });
 export type DesktopCliCommandState = typeof DesktopCliCommandStateSchema.Type;
 
+export const DesktopActiveProfileSchema = Schema.Struct({
+  id: Schema.String,
+  name: Schema.NullOr(Schema.String),
+  isDefault: Schema.Boolean,
+});
+export type DesktopActiveProfile = typeof DesktopActiveProfileSchema.Type;
+
 export interface DesktopUpdateActionResult {
   accepted: boolean;
   completed: boolean;
@@ -1110,6 +1117,12 @@ export interface DesktopBridge {
   getRelayTelemetryEnabled: () => boolean | null;
   getPathForFile: (file: File) => string;
   getClientPlatform: () => string;
+  /** Absent on web, mobile, non-macOS desktop and older desktops. */
+  profiles?: {
+    getActive: () => Promise<DesktopActiveProfile>;
+    /** Resolves false when the user cancels the confirmation; otherwise the app relaunches. */
+    switchProfile: () => Promise<boolean>;
+  };
   restartAudioService?: () => Promise<boolean>;
   setNotificationBadge: (badge: { count: number; image: string | null }) => Promise<void>;
   onNotificationBadgeClear: (listener: () => void) => () => void;

@@ -154,3 +154,19 @@ export const COMPLETE_LEGACY_LOCAL_STORAGE_CHANNEL = "desktop:complete-legacy-lo
 export const RESTART_AUDIO_SERVICE_CHANNEL = "desktop:restart-audio-service";
 
 export const START_FILE_DRAG_CHANNEL = "desktop:start-file-drag";
+
+export const PROFILES_ENABLED_CHANNEL = "desktop:profiles-enabled";
+export const PROFILES_GET_ACTIVE_CHANNEL = "desktop:profiles-get-active";
+export const PROFILES_SWITCH_CHANNEL = "desktop:profiles-switch";
+
+// The picker preload is sandboxed and imports these without pulling in effect.
+export const PROFILE_PICKER_CHANNELS = {
+  getState: "profile-picker:get-state",
+  create: "profile-picker:create",
+  rename: "profile-picker:rename",
+  setPassword: "profile-picker:set-password",
+  moveToTrash: "profile-picker:move-to-trash",
+  open: "profile-picker:open",
+  revealRegistry: "profile-picker:reveal-registry",
+  quit: "profile-picker:quit",
+} as const;
