@@ -1,6 +1,6 @@
 import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
 import * as Effect from "effect/Effect";
-import type * as Layer from "effect/Layer";
+import * as Layer from "effect/Layer";
 import * as Electron from "electron";
 import { msg } from "gt-i18n";
 
@@ -135,8 +135,7 @@ export const startPickerProcess = (launch: PickerLaunch, deps: PickerProcessDeps
   runMain(
     program(launch, windowRef).pipe(
       Effect.scoped,
-      Effect.provide(ElectronApp.layer),
-      Effect.provide(deps.layer),
+      Effect.provide(Layer.mergeAll(ElectronApp.layer, deps.layer)),
     ),
   );
 };
