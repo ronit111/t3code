@@ -127,6 +127,7 @@ import * as ThreadViewers from "./orchestration-v2/ThreadViewers.ts";
 import * as CommandOutputHub from "./orchestration-v2/CommandOutputHub.ts";
 import * as McpAppRequests from "./mcpApps/McpAppRequests.ts";
 import * as McpSignIn from "./mcpApps/McpSignIn.ts";
+import * as ClaudeMcpServers from "./provider/ClaudeMcpServers.ts";
 import * as ProviderSessionManager from "./orchestration-v2/ProviderSessionManager.ts";
 import * as ThreadLaunchService from "./orchestration-v2/ThreadLaunchService.ts";
 import * as ThreadMessageIntake from "./orchestration-v2/ThreadMessageIntake.ts";
@@ -1473,6 +1474,7 @@ export const layerWsRpc = (
       const providerSessionsV2 = yield* ProviderSessionManager.ProviderSessionManagerV2;
       const mcpAppRequests = yield* McpAppRequests.McpAppRequests;
       const mcpSignIn = yield* McpSignIn.McpSignIn;
+      const claudeMcpServers = yield* ClaudeMcpServers.ClaudeMcpServers;
       const analytics = yield* AnalyticsService.AnalyticsService;
       const originProps = clientAnalyticsProps;
       const recordClientCommandAnalytics = (command: OrchestrationV2Command) => {
@@ -2638,6 +2640,16 @@ export const layerWsRpc = (
         [WS_METHODS.mcpAppsReadResource]: (input) => mcpAppRequests.readResource(input),
         [WS_METHODS.providerMcpSignInStart]: (input) => mcpSignIn.start(input),
         [WS_METHODS.providerMcpSignInComplete]: (input) => mcpSignIn.complete(input),
+        [WS_METHODS.claudeConnectorsList]: (input) => claudeMcpServers.list(input),
+        [WS_METHODS.claudeConnectorsAdd]: (input) => claudeMcpServers.add(input),
+        [WS_METHODS.claudeConnectorsRemove]: (input) => claudeMcpServers.remove(input),
+        [WS_METHODS.claudeConnectorsSetAccountConnectors]: (input) =>
+          claudeMcpServers.setAccountConnectors(input),
+        [WS_METHODS.claudeConnectorsSignInStart]: (input) => claudeMcpServers.signInStart(input),
+        [WS_METHODS.claudeConnectorsSignInComplete]: (input) =>
+          claudeMcpServers.signInComplete(input),
+        [WS_METHODS.claudeConnectorsSignInCancel]: (input) => claudeMcpServers.signInCancel(input),
+        [WS_METHODS.claudeConnectorsSignOut]: (input) => claudeMcpServers.signOut(input),
         [WS_METHODS.providerUploadFeedback]:
           /* Request instrumentation already owns the span; keep this helper in that context. */
           Effect.fnUntraced(

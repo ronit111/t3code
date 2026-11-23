@@ -21,6 +21,14 @@ export const CLIENT_GUARDED_RPC_SCOPES = {
   // An MCP sign-in stores a credential for the agent, as an account sign-in does.
   [WS_METHODS.providerMcpSignInStart]: AuthProvidersManageScope,
   [WS_METHODS.providerMcpSignInComplete]: AuthProvidersManageScope,
+  // Connectors run commands and hold credentials for the agent, as provider setup does.
+  [WS_METHODS.claudeConnectorsAdd]: AuthProvidersManageScope,
+  [WS_METHODS.claudeConnectorsRemove]: AuthProvidersManageScope,
+  [WS_METHODS.claudeConnectorsSetAccountConnectors]: AuthProvidersManageScope,
+  [WS_METHODS.claudeConnectorsSignInStart]: AuthProvidersManageScope,
+  [WS_METHODS.claudeConnectorsSignInComplete]: AuthProvidersManageScope,
+  [WS_METHODS.claudeConnectorsSignInCancel]: AuthProvidersManageScope,
+  [WS_METHODS.claudeConnectorsSignOut]: AuthProvidersManageScope,
   [WS_METHODS.previewClose]: AuthPreviewOperateScope,
   // Stopping a server signals its processes, as closing a terminal does.
   [WS_METHODS.previewStopLocalServer]: AuthTerminalOperateScope,
