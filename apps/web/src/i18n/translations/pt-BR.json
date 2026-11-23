@@ -71,6 +71,7 @@
   "cd03eb1b84271c02": "Agente",
   "bfe1a60f3f9c60fb": "Turno {turn} · {what}",
   "dfdaa6255a416140": "Resumo de {turns, plural, one {{turns} turno recente} other {{turns} turnos recentes}}, {textTurns, plural, =0 {sem texto das mensagens} one {com o texto das mensagens do último turno} other {com o texto das mensagens dos últimos {textTurns} turnos}}{truncated, select, yes {, encurtado para caber} other {}}",
+  "260c6b45f52d2f27": "Adiciona o texto das suas mensagens e das respostas do agente {textTurns, plural, one {no último turno} other {nos últimos {textTurns} turnos}}.",
   "afac52a5cc2dc801": "Não foi possível enviar sua resposta. Tente novamente.",
   "79d776428f4d0650": "Não foi possível carregar o arquivo. Reconecte e tente novamente.",
   "3ea34cbb1ca5ba9b": "Pré-visualização cancelada.",
@@ -1814,6 +1815,9 @@
   "8b2568d16b3c4862": "Informe a URL de clone do Git",
   "b405e5c74b9171a4": "Informe o repositório do {source} ({hint})",
   "711be1156ddc8f81": "Mudar tema",
+  "ded627cbfded4c40": "Switch profile...",
+  "3158b57c6a1a5ca2": "Current profile: {name}",
+  "71f78abaa2a194dd": "Default",
   "d1cfebdc64096517": "Seletor de arquivos",
   "c504287bfea90f78": "Pesquisar no conteúdo do projeto",
   "f9153168b50dcc15": "Paleta de comandos",
@@ -3044,6 +3048,8 @@
   "a1c2e064ead9e88d": "Não foi possível iniciar uma nova thread",
   "c9f0735ef91f895b": "O projeto continua disponível. Tente abrir o rascunho novamente.",
   "b3036052b23a9f21": "Não foi possível abrir o link",
+  "202910c868f9d1ab": "Reconnect {label} to manage its connectors.",
+  "00244120372fd032": "Connect an environment to manage its connectors.",
   "d504f8f37caf6483": "Reconecte {label} para configurar os provedores.",
   "c8380bf9638c2156": "Conecte um ambiente para configurar os provedores.",
   "8c1bb7953bdeb59b": "{title} exige um ambiente compatível. Escolha um para continuar.",
@@ -3633,7 +3639,6 @@
   "4e0710d19dfc2e7e": "Enviar este relatório para a equipe do T3?",
   "87d0ae0723ba75d1": "Isto é tudo o que sai da sua máquina. Nada é enviado até você clicar em Enviar.",
   "bf19826f81484328": "Incluir a conversa",
-  "260c6b45f52d2f27": "Adiciona o texto das suas mensagens e das respostas do agente {textTurns, plural, one {no último turno} other {nos últimos {textTurns} turnos}}.",
   "ddb7e6f8ce99e657": "Somente quem pode executar agentes nesta máquina pode enviar ou recusar o relatório.",
   "03c1eb603c112f47": "Não enviar",
   "653405e4ed498d9f": "Enviar",
@@ -7428,6 +7433,29 @@
   "2758b668abf05728": "ex.: Pessoal ou Trabalho",
   "d5cd2aab468d355d": "Adicionando a conta…",
   "dcd0fc3afe1b15d5": "Concluir depois",
+  "986fcd365e71040f": "Cabeçalhos",
+  "abbb7ceb3be065d3": "Use letters, numbers, dots, dashes or underscores for the name, starting with a letter or number.",
+  "f4cccefdb8125ff0": "Enter a web address that starts with http:// or https://.",
+  "991e801362842b57": "Enter the command that starts the server.",
+  "c4a34c72b3fa724e": "Headers line {line} needs a name and a value, like Authorization: Bearer token.",
+  "54347d419838a700": "Environment line {line} needs a name and a value, like API_KEY=value.",
+  "3e872f1de30b2a83": "{field} line {line} has a name with characters that aren't allowed.",
+  "cbb3de082585e536": "{field} names {key} more than once.",
+  "7e731addcd6cfa04": "{field} line {line} is too long.",
+  "bbb3d528320fe82f": "A connector with this name already exists. Remove it first to change it.",
+  "03b456f47dab17c3": "Web address (HTTP)",
+  "997e29a636ac23a0": "Web address (SSE)",
+  "4d2ac8205fef96e1": "Comando",
+  "8a7e6ab0307f5f1f": "API_KEY=your key",
+  "5319535feec916f1": "Authorization: Bearer your token",
+  "93020c4e13cf4729": "Add a connector",
+  "6d119cb2bdc8bd65": "An MCP server this Claude provider's sessions can use. Header and environment values stay on the server and are never shown again.",
+  "35dfd187a3f73c68": "Kind",
+  "6c3e4dd0114bc890": "Arguments (one per line)",
+  "eb3ea1179cb5811a": "Environment (NAME=value per line)",
+  "dc634d8a4725cea7": "URL",
+  "de9901bcb55b39c9": "Headers (Name: value per line)",
+  "02fa57512dc205c2": "Add connector",
   "3556f64528d2977b": "Rota adicionada",
   "36042171d38249b1": "Ambiente conectado",
   "7fe508061821950a": "{environment} agora pode ser acessado via SSH em {host}.",
@@ -8235,6 +8263,57 @@
   "2a0148ea9068a814": "Porta HTTPS",
   "7f4f2ba57d3d1c76": "Informe uma porta de 1 a 65535.",
   "82af9c66caf2f40c": "Endpoint HTTPS",
+  "2cc74a0f382a49de": "Could not open the sign-in page. Copy the address instead.",
+  "4b3dafdef8580cd1": [
+    "Sign in to ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    }
+  ],
+  "50a9793916cf9a22": "Signed in. New sessions can use this connector.",
+  "5aef650eb9fd67a4": "Approve access in your browser. When the browser lands on a new page, even one that fails to load, copy its address and paste it here.",
+  "cd208c1e7a5735dc": "Start sign-in",
+  "1af3a100c8894cf2": "Paste the address your browser ended on",
+  "04cfc0a0f896cfa6": "Complete",
+  "67b0aa74e38ca261": "HTTP",
+  "97d085ca98381892": "SSE",
+  "2029f779cdc2881d": "WebSocket",
+  "43897f5bc2c1e321": "Connectors",
+  "5a1016e49e138fc0": "Add a Claude provider first",
+  "b9a7897b79798bb4": "Connectors belong to a Claude provider. Add one on {label} to give it connectors.",
+  "5a4aa773daba0c1d": "Claude provider",
+  "151b01e2043e1b50": "You need permission to manage providers on {label} to see and change its connectors.",
+  "c1e032a171a3892d": "This environment's T3 Code doesn't have Connectors.",
+  "7f676d6d09df1795": "Connectors are unavailable",
+  "ef4077144bd24fac": "Account connectors (claude.ai)",
+  "317778ac0d161476": "When on, sessions also get the connectors set up on claude.ai for this subscription, which everyone who uses the subscription sees. Applies to new sessions.",
+  "e69858b7f84f5a73": "Uses: {names}",
+  "f6ce0f90b214fab8": "Open Providers",
+  "d7d9a2bc0b087e23": "You can see these connectors, but you don't have permission to change them.",
+  "c066c32d148b0ce9": [
+    "No connectors yet. Add one to give this provider's sessions more tools. They live in",
+    " ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    "."
+  ],
+  "78a1a02732fc74e8": "Sair",
+  "111a44209dc6e701": "Remover",
+  "a3538ba5ca802bd7": [
+    "Remover ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    "?"
+  ],
+  "5a3b8e6bd6cdb31f": "New sessions stop getting this connector's tools. Running sessions keep it until they end. To change a connector, remove it and add it again.",
   "0e0007dd7a694472": "valor",
   "c9bacc3dea4ba2ba": "Valor da opção",
   "9f054868dad69700": "Rótulo da opção",
@@ -8749,9 +8828,13 @@
   "ed83b25c71c98a20": "Escolha um ou mais {scope}s do {tracker} para cada projeto. As issues deles aparecem ao lado das do repositório, e os agentes criam novas issues no primeiro, a menos que outro seja pedido.",
   "19c2d5e81ff8f89a": "{scope} do {tracker} para {project}",
   "68e061510b765772": "Não vinculado",
+  "99d51127f573296b": "Outra conta",
+  "8ec2c57414669b79": "Conecte um segundo espaço de trabalho ou usuário do {tracker}.",
+  "99963c0142e17f00": "Para a nova conta do {tracker}.",
   "a2d95d39d3398bda": "Credencial recusada",
   "9eae463720500113": "Armazenado no servidor.",
   "b6e27ab2537ef874": "Criar um",
+  "6d8e4ebc889bace9": "Adicionar conta",
   "13ef526271b0f5d4": "Limpar todas as condições",
   "d1938a629f039515": "Remover condição",
   "84a605b241ce65b7": "Remover grupo e as condições dele",
@@ -8858,7 +8941,6 @@
   "f8cb80286abc221a": "Personalizado",
   "a23f6ce22a80387e": "Projeto",
   "87374bfe1fd81fdf": "Editar cláusula when de {command}",
-  "4d2ac8205fef96e1": "Comando",
   "a1dbe20d209982b6": "Pesquisar",
   "c32ec5fdfc00da48": "Atalho de teclado do novo atalho",
   "63bcef95ecadc84f": "Editar a cláusula when do novo atalho de teclado",
@@ -9187,7 +9269,6 @@
   "e749b8ba2ff18f8f": "Adicionar {name} ao projeto",
   "6d08f0285e2bbf34": "Adicionar pasta",
   "b7820a37d8ff1918": "Os repositórios dentro desta pasta fazem parte do projeto assim que estão lá. Adicione uma pasta para trazer um de outro lugar.",
-  "111a44209dc6e701": "Remover",
   "daafb41c2b3c066f": "No arquivo de workspace",
   "2c5c798252f91fdc": "Adicionar",
   "7e4d1ce9725c2327": "Rastreie um repositório ou uma pasta em qualquer lugar da máquina deste projeto.",
@@ -9295,7 +9376,6 @@
   "366e370da9d8b04c": "Abrir navegador",
   "50c877d9fa8db3ec": "Copiar link de login",
   "663df6ba60de573b": "Abrir documentação",
-  "78a1a02732fc74e8": "Sair",
   "e53ca6f665197e44": [
     "Digite o código",
     " ",
@@ -9812,7 +9892,6 @@
   "e5de50fce39b5756": "Execução agendada para quando a janela fechar; nenhuma execução iniciada ainda.",
   "825ace433c575c98": "Nenhuma execução foi iniciada para esta requisição.",
   "85997c1618130558": "Placeholders vazios: {fields}",
-  "986fcd365e71040f": "Cabeçalhos",
   "ab5f7cd7f8d24e36": "Consulta",
   "4d3cc9f81db78869": "Corpo (truncado)",
   "4f1d3ffa2da32c93": "Corpo",
@@ -9974,15 +10053,6 @@
   ],
   "13d4f258e93f1dc1": "Conecte um ambiente para gerenciar os provedores de segredos de onde as variáveis de provedor dele leem.",
   "88466f5a03be2419": "Configuração do ambiente inteiro. Selecione um ambiente para alterá-la.",
-  "a3538ba5ca802bd7": [
-    "Remover ",
-    {
-      "i": 1,
-      "k": "_gt_value_1",
-      "v": "v"
-    },
-    "?"
-  ],
   "0d5b3b39f92c04e4": "Remover provedor",
   "c52bdbe39649742c": [
     "Nada lê de ",
@@ -11926,6 +11996,7 @@
   "dd95128501e22145": "Flash de captura",
   "9f5280c955132ee1": "Animações de captura",
   "f8d32e19131fd5b3": "agentes cli codex claude cursor grok fx kiro opencode antigravity google entrar sair instalar assinatura instâncias autenticação chave de api modelos configuração caminho do binário diretório de configuração codex_home shadow home endpoint argumentos variáveis de ambiente nome de exibição cor de destaque personalizado favorito oculto compactação automática sessões nativas importar retomar",
+  "776e01384caa6e6e": "mcp connectors servers tools claude oauth",
   "ad371af21e5b4b01": "Provedores de uso",
   "9d9d31a4f3d5ff69": "fontes de uso CLIProxyAPI proxy de CLI hub cota assinatura limites chave de gerenciamento adicionar remover",
   "d65fa0946585b245": "Geradores de texto",
@@ -12598,6 +12669,16 @@
   "156ff7b625287a1e": "Ocultar puladas",
   "69b985b97ab45e6b": "Mostrar puladas ({count})",
   "2400254d362de84d": "Carregando execuções de workflow…",
+  "cae5c3205c01d062": [
+    {
+      "t": "span",
+      "i": 1,
+      "c": "Um arquivo de workflow tem um problema."
+    },
+    " ",
+    "A última versão que carregou continua em execução."
+  ],
+  "ed8ce6ebc73dc12d": "Abrir o arquivo",
   "145e1f7503ba3b2c": [
     "Este ambiente não tem nenhuma execução com esse link.",
     " ",
@@ -12623,16 +12704,6 @@
       "c": "Leia o guia"
     }
   ],
-  "cae5c3205c01d062": [
-    {
-      "t": "span",
-      "i": 1,
-      "c": "Um arquivo de workflow tem um problema."
-    },
-    " ",
-    "A última versão que carregou continua em execução."
-  ],
-  "ed8ce6ebc73dc12d": "Abrir o arquivo",
   "5d8d278ff828102d": "Todos os workflows",
   "39459da07479f482": "Agente",
   "7741243632056b81": "{step} · transcrição",
@@ -12777,9 +12848,5 @@
   "27d76249d09eb69f": "Guia de revisão pronto",
   "faa3bb26abb39c93": "O guia de revisão falhou",
   "b7df38b7d8792d78": "Abrir guia",
-  "9e91e9a77b664e4e": "Não foi possível iniciar um guia de revisão",
-  "99d51127f573296b": "Outra conta",
-  "8ec2c57414669b79": "Conecte um segundo espaço de trabalho ou usuário do {tracker}.",
-  "99963c0142e17f00": "Para a nova conta do {tracker}.",
-  "6d8e4ebc889bace9": "Adicionar conta"
+  "9e91e9a77b664e4e": "Não foi possível iniciar um guia de revisão"
 }

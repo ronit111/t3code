@@ -71,6 +71,7 @@
   "cd03eb1b84271c02": "Agent",
   "bfe1a60f3f9c60fb": "Turn {turn} · {what}",
   "dfdaa6255a416140": "Outline of {turns, plural, one {{turns} recent turn} other {{turns} recent turns}}, {textTurns, plural, =0 {no message text} one {message text of the last turn} other {message text of the last {textTurns} turns}}{truncated, select, yes {, shortened to fit} other {}}",
+  "260c6b45f52d2f27": "Adds the text of your messages and the agent's replies in the last {textTurns, plural, one {turn} other {{textTurns} turns}}.",
   "afac52a5cc2dc801": "Could not send your answer. Try again.",
   "79d776428f4d0650": "The file could not be loaded. Reconnect and try again.",
   "3ea34cbb1ca5ba9b": "Preview cancelled.",
@@ -1814,6 +1815,9 @@
   "8b2568d16b3c4862": "Enter Git clone URL",
   "b405e5c74b9171a4": "Enter {source} repository ({hint})",
   "711be1156ddc8f81": "Change theme",
+  "ded627cbfded4c40": "Switch profile...",
+  "3158b57c6a1a5ca2": "Current profile: {name}",
+  "71f78abaa2a194dd": "Default",
   "d1cfebdc64096517": "File picker",
   "c504287bfea90f78": "Search project contents",
   "f9153168b50dcc15": "Command palette",
@@ -3044,6 +3048,8 @@
   "a1c2e064ead9e88d": "Couldn’t start a new thread",
   "c9f0735ef91f895b": "The project is still available. Try opening the draft again.",
   "b3036052b23a9f21": "Could not open the link",
+  "202910c868f9d1ab": "Reconnect {label} to manage its connectors.",
+  "00244120372fd032": "Connect an environment to manage its connectors.",
   "d504f8f37caf6483": "Reconnect {label} to set up its providers.",
   "c8380bf9638c2156": "Connect an environment to set up its providers.",
   "8c1bb7953bdeb59b": "{title} requires a supporting environment. Choose one to continue.",
@@ -3633,7 +3639,6 @@
   "4e0710d19dfc2e7e": "Send this report to the T3 team?",
   "87d0ae0723ba75d1": "This is everything that leaves your machine. Nothing is sent unless you press Send.",
   "bf19826f81484328": "Include the conversation",
-  "260c6b45f52d2f27": "Adds the text of your messages and the agent's replies in the last {textTurns, plural, one {turn} other {{textTurns} turns}}.",
   "ddb7e6f8ce99e657": "Only someone who can run agents on this machine can send or decline it.",
   "03c1eb603c112f47": "Don't send",
   "653405e4ed498d9f": "Send",
@@ -7435,6 +7440,29 @@
   "2758b668abf05728": "e.g. Personal or Work",
   "d5cd2aab468d355d": "Adding account…",
   "dcd0fc3afe1b15d5": "Finish later",
+  "986fcd365e71040f": "Headers",
+  "abbb7ceb3be065d3": "Use letters, numbers, dots, dashes or underscores for the name, starting with a letter or number.",
+  "f4cccefdb8125ff0": "Enter a web address that starts with http:// or https://.",
+  "991e801362842b57": "Enter the command that starts the server.",
+  "c4a34c72b3fa724e": "Headers line {line} needs a name and a value, like Authorization: Bearer token.",
+  "54347d419838a700": "Environment line {line} needs a name and a value, like API_KEY=value.",
+  "3e872f1de30b2a83": "{field} line {line} has a name with characters that aren't allowed.",
+  "cbb3de082585e536": "{field} names {key} more than once.",
+  "7e731addcd6cfa04": "{field} line {line} is too long.",
+  "bbb3d528320fe82f": "A connector with this name already exists. Remove it first to change it.",
+  "03b456f47dab17c3": "Web address (HTTP)",
+  "997e29a636ac23a0": "Web address (SSE)",
+  "4d2ac8205fef96e1": "Command",
+  "8a7e6ab0307f5f1f": "API_KEY=your key",
+  "5319535feec916f1": "Authorization: Bearer your token",
+  "93020c4e13cf4729": "Add a connector",
+  "6d119cb2bdc8bd65": "An MCP server this Claude provider's sessions can use. Header and environment values stay on the server and are never shown again.",
+  "35dfd187a3f73c68": "Kind",
+  "6c3e4dd0114bc890": "Arguments (one per line)",
+  "eb3ea1179cb5811a": "Environment (NAME=value per line)",
+  "dc634d8a4725cea7": "URL",
+  "de9901bcb55b39c9": "Headers (Name: value per line)",
+  "02fa57512dc205c2": "Add connector",
   "3556f64528d2977b": "Route added",
   "36042171d38249b1": "Environment connected",
   "7fe508061821950a": "{environment} can now be reached over SSH {host}.",
@@ -8243,6 +8271,57 @@
   "2a0148ea9068a814": "HTTPS port",
   "7f4f2ba57d3d1c76": "Enter a port from 1 to 65535.",
   "82af9c66caf2f40c": "HTTPS endpoint",
+  "2cc74a0f382a49de": "Could not open the sign-in page. Copy the address instead.",
+  "4b3dafdef8580cd1": [
+    "Sign in to ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    }
+  ],
+  "50a9793916cf9a22": "Signed in. New sessions can use this connector.",
+  "5aef650eb9fd67a4": "Approve access in your browser. When the browser lands on a new page, even one that fails to load, copy its address and paste it here.",
+  "cd208c1e7a5735dc": "Start sign-in",
+  "1af3a100c8894cf2": "Paste the address your browser ended on",
+  "04cfc0a0f896cfa6": "Complete",
+  "67b0aa74e38ca261": "HTTP",
+  "97d085ca98381892": "SSE",
+  "2029f779cdc2881d": "WebSocket",
+  "43897f5bc2c1e321": "Connectors",
+  "5a1016e49e138fc0": "Add a Claude provider first",
+  "b9a7897b79798bb4": "Connectors belong to a Claude provider. Add one on {label} to give it connectors.",
+  "5a4aa773daba0c1d": "Claude provider",
+  "151b01e2043e1b50": "You need permission to manage providers on {label} to see and change its connectors.",
+  "c1e032a171a3892d": "This environment's T3 Code doesn't have Connectors.",
+  "7f676d6d09df1795": "Connectors are unavailable",
+  "ef4077144bd24fac": "Account connectors (claude.ai)",
+  "317778ac0d161476": "When on, sessions also get the connectors set up on claude.ai for this subscription, which everyone who uses the subscription sees. Applies to new sessions.",
+  "e69858b7f84f5a73": "Uses: {names}",
+  "f6ce0f90b214fab8": "Open Providers",
+  "d7d9a2bc0b087e23": "You can see these connectors, but you don't have permission to change them.",
+  "c066c32d148b0ce9": [
+    "No connectors yet. Add one to give this provider's sessions more tools. They live in",
+    " ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    "."
+  ],
+  "78a1a02732fc74e8": "Sign out",
+  "111a44209dc6e701": "Remove",
+  "a3538ba5ca802bd7": [
+    "Remove ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    "?"
+  ],
+  "5a3b8e6bd6cdb31f": "New sessions stop getting this connector's tools. Running sessions keep it until they end. To change a connector, remove it and add it again.",
   "0e0007dd7a694472": "value",
   "c9bacc3dea4ba2ba": "Choice value",
   "9f054868dad69700": "Choice label",
@@ -8759,9 +8838,13 @@
   "ed83b25c71c98a20": "Pick one or more {tracker} {scope}s for each project. Their issues list beside the repository's own, and agents file new issues in the first one unless asked for another.",
   "19c2d5e81ff8f89a": "{tracker} {scope} for {project}",
   "68e061510b765772": "Not bound",
+  "99d51127f573296b": "Another account",
+  "8ec2c57414669b79": "Connect a second {tracker} workspace or user.",
+  "99963c0142e17f00": "For the new {tracker} account.",
   "a2d95d39d3398bda": "Credential rejected",
   "9eae463720500113": "Stored on the server.",
   "b6e27ab2537ef874": "Create one",
+  "6d8e4ebc889bace9": "Add account",
   "13ef526271b0f5d4": "Clear all conditions",
   "d1938a629f039515": "Remove condition",
   "84a605b241ce65b7": "Remove group and its conditions",
@@ -8868,7 +8951,6 @@
   "f8cb80286abc221a": "Custom",
   "a23f6ce22a80387e": "Project",
   "87374bfe1fd81fdf": "Edit when clause for {command}",
-  "4d2ac8205fef96e1": "Command",
   "a1dbe20d209982b6": "Search",
   "c32ec5fdfc00da48": "Keybinding for new keybinding",
   "63bcef95ecadc84f": "Edit when clause for new keybinding",
@@ -9196,7 +9278,6 @@
   "e749b8ba2ff18f8f": "Add {name} to the project",
   "6d08f0285e2bbf34": "Add folder",
   "b7820a37d8ff1918": "Repositories inside this folder are part of the project as soon as they are there. Add a folder to bring in one from somewhere else.",
-  "111a44209dc6e701": "Remove",
   "daafb41c2b3c066f": "In workspace file",
   "2c5c798252f91fdc": "Add",
   "7e4d1ce9725c2327": "Track a repository or folder anywhere on this project's machine.",
@@ -9303,7 +9384,6 @@
   "366e370da9d8b04c": "Open browser",
   "50c877d9fa8db3ec": "Copy sign-in link",
   "663df6ba60de573b": "Open docs",
-  "78a1a02732fc74e8": "Sign out",
   "e53ca6f665197e44": [
     "Enter code",
     " ",
@@ -9822,7 +9902,6 @@
   "e5de50fce39b5756": "Run scheduled when the window closes; no run started yet.",
   "825ace433c575c98": "No run was started for this request.",
   "85997c1618130558": "Empty placeholders: {fields}",
-  "986fcd365e71040f": "Headers",
   "ab5f7cd7f8d24e36": "Query",
   "4d3cc9f81db78869": "Body (truncated)",
   "4f1d3ffa2da32c93": "Body",
@@ -9984,15 +10063,6 @@
   ],
   "13d4f258e93f1dc1": "Connect an environment to manage the secret providers its provider variables read from.",
   "88466f5a03be2419": "Environment-wide setting. Select an environment to change it.",
-  "a3538ba5ca802bd7": [
-    "Remove ",
-    {
-      "i": 1,
-      "k": "_gt_value_1",
-      "v": "v"
-    },
-    "?"
-  ],
   "0d5b3b39f92c04e4": "Remove provider",
   "c52bdbe39649742c": [
     "Nothing reads from ",
@@ -11936,6 +12006,7 @@
   "dd95128501e22145": "Capture flash",
   "9f5280c955132ee1": "Capture animations",
   "f8d32e19131fd5b3": "agents cli codex claude cursor grok fx kiro opencode antigravity google sign in sign out install subscription instances authentication api key models configuration binary path config directory codex_home shadow home endpoint arguments environment variables display name accent color custom favorite hidden auto compact native sessions import resume",
+  "776e01384caa6e6e": "mcp connectors servers tools claude oauth",
   "ad371af21e5b4b01": "Usage providers",
   "9d9d31a4f3d5ff69": "usage sources CLIProxyAPI CLI proxy hub quota subscription limits management key add remove",
   "d65fa0946585b245": "Text generators",
@@ -12608,6 +12679,16 @@
   "156ff7b625287a1e": "Hide skipped",
   "69b985b97ab45e6b": "Show {count} skipped",
   "2400254d362de84d": "Loading workflow runs…",
+  "cae5c3205c01d062": [
+    {
+      "t": "span",
+      "i": 1,
+      "c": "A workflow file has a problem."
+    },
+    " ",
+    "The last version that did keeps running."
+  ],
+  "ed8ce6ebc73dc12d": "Open the file",
   "145e1f7503ba3b2c": [
     "This environment has no run with that link.",
     " ",
@@ -12633,16 +12714,6 @@
       "c": "Read the guide"
     }
   ],
-  "cae5c3205c01d062": [
-    {
-      "t": "span",
-      "i": 1,
-      "c": "A workflow file has a problem."
-    },
-    " ",
-    "The last version that did keeps running."
-  ],
-  "ed8ce6ebc73dc12d": "Open the file",
   "5d8d278ff828102d": "All workflows",
   "39459da07479f482": "Agent",
   "7741243632056b81": "{step} · transcript",
@@ -12786,9 +12857,5 @@
   "27d76249d09eb69f": "Review guide ready",
   "faa3bb26abb39c93": "Review guide failed",
   "b7df38b7d8792d78": "Open guide",
-  "9e91e9a77b664e4e": "Could not start a review guide",
-  "99d51127f573296b": "Another account",
-  "8ec2c57414669b79": "Connect a second {tracker} workspace or user.",
-  "99963c0142e17f00": "For the new {tracker} account.",
-  "6d8e4ebc889bace9": "Add account"
+  "9e91e9a77b664e4e": "Could not start a review guide"
 }

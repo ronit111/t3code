@@ -71,6 +71,7 @@
   "cd03eb1b84271c02": "エージェント",
   "bfe1a60f3f9c60fb": "ターン {turn} · {what}",
   "dfdaa6255a416140": "{turns, plural, one {直近 {turns} ターン} other {直近 {turns} ターン}}の概要、{textTurns, plural, =0 {メッセージ本文なし} one {最後のターンのメッセージ本文} other {直近 {textTurns} ターンのメッセージ本文}}{truncated, select, yes {、収まる長さに短縮済み} other {}}",
+  "260c6b45f52d2f27": "直近 {textTurns} ターンでのあなたのメッセージとエージェントの返信の本文を追加します。",
   "afac52a5cc2dc801": "回答を送信できませんでした。もう一度お試しください。",
   "79d776428f4d0650": "ファイルを読み込めませんでした。再接続してもう一度お試しください。",
   "3ea34cbb1ca5ba9b": "プレビューをキャンセルしました。",
@@ -1813,6 +1814,9 @@
   "8b2568d16b3c4862": "Git のクローン URL を入力",
   "b405e5c74b9171a4": "{source} のリポジトリを入力 ({hint})",
   "711be1156ddc8f81": "テーマを変更",
+  "ded627cbfded4c40": "Switch profile...",
+  "3158b57c6a1a5ca2": "Current profile: {name}",
+  "71f78abaa2a194dd": "Default",
   "d1cfebdc64096517": "ファイル選択",
   "c504287bfea90f78": "プロジェクトの内容を検索",
   "f9153168b50dcc15": "コマンドパレット",
@@ -3042,6 +3046,8 @@
   "a1c2e064ead9e88d": "新しいスレッドを開始できませんでした",
   "c9f0735ef91f895b": "プロジェクトはまだ利用できます。もう一度下書きを開いてみてください。",
   "b3036052b23a9f21": "リンクを開けませんでした",
+  "202910c868f9d1ab": "Reconnect {label} to manage its connectors.",
+  "00244120372fd032": "Connect an environment to manage its connectors.",
   "d504f8f37caf6483": "プロバイダーを設定するには {label} に再接続してください。",
   "c8380bf9638c2156": "プロバイダーを設定するには環境を接続してください。",
   "8c1bb7953bdeb59b": "{title} には対応する環境が必要です。続行するには環境を選択してください。",
@@ -3629,7 +3635,6 @@
   "4e0710d19dfc2e7e": "このレポートを T3 チームに送信しますか？",
   "87d0ae0723ba75d1": "この内容だけがこのマシンから送信されます。「送信」を押すまで何も送信されません。",
   "bf19826f81484328": "会話を含める",
-  "260c6b45f52d2f27": "直近 {textTurns} ターンでのあなたのメッセージとエージェントの返信の本文を追加します。",
   "ddb7e6f8ce99e657": "このマシンでエージェントを実行できる人だけが、送信または拒否できます。",
   "03c1eb603c112f47": "送信しない",
   "653405e4ed498d9f": "送信",
@@ -7395,6 +7400,29 @@
   "2758b668abf05728": "例: 個人、仕事",
   "d5cd2aab468d355d": "アカウントを追加しています…",
   "dcd0fc3afe1b15d5": "後で完了",
+  "986fcd365e71040f": "ヘッダー",
+  "abbb7ceb3be065d3": "Use letters, numbers, dots, dashes or underscores for the name, starting with a letter or number.",
+  "f4cccefdb8125ff0": "Enter a web address that starts with http:// or https://.",
+  "991e801362842b57": "Enter the command that starts the server.",
+  "c4a34c72b3fa724e": "Headers line {line} needs a name and a value, like Authorization: Bearer token.",
+  "54347d419838a700": "Environment line {line} needs a name and a value, like API_KEY=value.",
+  "3e872f1de30b2a83": "{field} line {line} has a name with characters that aren't allowed.",
+  "cbb3de082585e536": "{field} names {key} more than once.",
+  "7e731addcd6cfa04": "{field} line {line} is too long.",
+  "bbb3d528320fe82f": "A connector with this name already exists. Remove it first to change it.",
+  "03b456f47dab17c3": "Web address (HTTP)",
+  "997e29a636ac23a0": "Web address (SSE)",
+  "4d2ac8205fef96e1": "コマンド",
+  "8a7e6ab0307f5f1f": "API_KEY=your key",
+  "5319535feec916f1": "Authorization: Bearer your token",
+  "93020c4e13cf4729": "Add a connector",
+  "6d119cb2bdc8bd65": "An MCP server this Claude provider's sessions can use. Header and environment values stay on the server and are never shown again.",
+  "35dfd187a3f73c68": "Kind",
+  "6c3e4dd0114bc890": "Arguments (one per line)",
+  "eb3ea1179cb5811a": "Environment (NAME=value per line)",
+  "dc634d8a4725cea7": "URL",
+  "de9901bcb55b39c9": "Headers (Name: value per line)",
+  "02fa57512dc205c2": "Add connector",
   "3556f64528d2977b": "ルートを追加しました",
   "36042171d38249b1": "環境を接続しました",
   "7fe508061821950a": "{environment} に SSH {host} 経由で接続できるようになりました。",
@@ -8196,6 +8224,56 @@
   "2a0148ea9068a814": "HTTPS ポート",
   "7f4f2ba57d3d1c76": "1〜65535 のポートを入力してください。",
   "82af9c66caf2f40c": "HTTPS エンドポイント",
+  "2cc74a0f382a49de": "Could not open the sign-in page. Copy the address instead.",
+  "4b3dafdef8580cd1": [
+    "Sign in to ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    }
+  ],
+  "50a9793916cf9a22": "Signed in. New sessions can use this connector.",
+  "5aef650eb9fd67a4": "Approve access in your browser. When the browser lands on a new page, even one that fails to load, copy its address and paste it here.",
+  "cd208c1e7a5735dc": "Start sign-in",
+  "1af3a100c8894cf2": "Paste the address your browser ended on",
+  "04cfc0a0f896cfa6": "Complete",
+  "67b0aa74e38ca261": "HTTP",
+  "97d085ca98381892": "SSE",
+  "2029f779cdc2881d": "WebSocket",
+  "43897f5bc2c1e321": "Connectors",
+  "5a1016e49e138fc0": "Add a Claude provider first",
+  "b9a7897b79798bb4": "Connectors belong to a Claude provider. Add one on {label} to give it connectors.",
+  "5a4aa773daba0c1d": "Claude provider",
+  "151b01e2043e1b50": "You need permission to manage providers on {label} to see and change its connectors.",
+  "c1e032a171a3892d": "This environment's T3 Code doesn't have Connectors.",
+  "7f676d6d09df1795": "Connectors are unavailable",
+  "ef4077144bd24fac": "Account connectors (claude.ai)",
+  "317778ac0d161476": "When on, sessions also get the connectors set up on claude.ai for this subscription, which everyone who uses the subscription sees. Applies to new sessions.",
+  "e69858b7f84f5a73": "Uses: {names}",
+  "f6ce0f90b214fab8": "Open Providers",
+  "d7d9a2bc0b087e23": "You can see these connectors, but you don't have permission to change them.",
+  "c066c32d148b0ce9": [
+    "No connectors yet. Add one to give this provider's sessions more tools. They live in",
+    " ",
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    "."
+  ],
+  "78a1a02732fc74e8": "サインアウト",
+  "111a44209dc6e701": "削除",
+  "a3538ba5ca802bd7": [
+    {
+      "i": 1,
+      "k": "_gt_value_1",
+      "v": "v"
+    },
+    " を削除しますか？"
+  ],
+  "5a3b8e6bd6cdb31f": "New sessions stop getting this connector's tools. Running sessions keep it until they end. To change a connector, remove it and add it again.",
   "0e0007dd7a694472": "値",
   "c9bacc3dea4ba2ba": "選択肢の値",
   "9f054868dad69700": "選択肢のラベル",
@@ -8707,9 +8785,13 @@
   "ed83b25c71c98a20": "各プロジェクトに {tracker} の {scope} を1つ以上選択します。その Issue はリポジトリ自身の Issue と並べて表示され、エージェントは別の {scope} を指定されない限り、最初の {scope} に新しい Issue を作成します。",
   "19c2d5e81ff8f89a": "{project} の {tracker} {scope}",
   "68e061510b765772": "未バインド",
+  "99d51127f573296b": "別のアカウント",
+  "8ec2c57414669b79": "2つ目の {tracker} ワークスペースまたはユーザーを接続します。",
+  "99963c0142e17f00": "新しい {tracker} アカウント用です。",
   "a2d95d39d3398bda": "資格情報が拒否されました",
   "9eae463720500113": "サーバーに保存されています。",
   "b6e27ab2537ef874": "作成する",
+  "6d8e4ebc889bace9": "アカウントを追加",
   "13ef526271b0f5d4": "すべての条件をクリア",
   "d1938a629f039515": "条件を削除",
   "84a605b241ce65b7": "グループとその条件を削除",
@@ -8816,7 +8898,6 @@
   "f8cb80286abc221a": "カスタム",
   "a23f6ce22a80387e": "プロジェクト",
   "87374bfe1fd81fdf": "{command} の when 句を編集",
-  "4d2ac8205fef96e1": "コマンド",
   "a1dbe20d209982b6": "検索",
   "c32ec5fdfc00da48": "新しいキーボードショートカットのキー",
   "63bcef95ecadc84f": "新しいキーボードショートカットの when 句を編集",
@@ -9144,7 +9225,6 @@
   "e749b8ba2ff18f8f": "{name} をプロジェクトに追加",
   "6d08f0285e2bbf34": "フォルダーを追加",
   "b7820a37d8ff1918": "このフォルダー内のリポジトリは、そこに置かれた時点でプロジェクトの一部になります。別の場所にあるリポジトリを取り込むには、フォルダーを追加してください。",
-  "111a44209dc6e701": "削除",
   "daafb41c2b3c066f": "ワークスペースファイルに記載",
   "2c5c798252f91fdc": "追加",
   "7e4d1ce9725c2327": "このプロジェクトのマシン上の任意の場所にあるリポジトリまたはフォルダーを追跡します。",
@@ -9252,7 +9332,6 @@
   "366e370da9d8b04c": "ブラウザーを開く",
   "50c877d9fa8db3ec": "サインインリンクをコピー",
   "663df6ba60de573b": "ドキュメントを開く",
-  "78a1a02732fc74e8": "サインアウト",
   "e53ca6f665197e44": [
     "ブラウザーでコード",
     " ",
@@ -9768,7 +9847,6 @@
   "e5de50fce39b5756": "期間が終了したときに実行される予定です。まだ実行は開始されていません。",
   "825ace433c575c98": "このリクエストでは実行が開始されませんでした。",
   "85997c1618130558": "空のプレースホルダー: {fields}",
-  "986fcd365e71040f": "ヘッダー",
   "ab5f7cd7f8d24e36": "クエリ",
   "4d3cc9f81db78869": "本文 (切り詰め)",
   "4f1d3ffa2da32c93": "本文",
@@ -9929,14 +10007,6 @@
   ],
   "13d4f258e93f1dc1": "プロバイダー変数の読み取り元となるシークレットプロバイダーを管理するには、環境に接続してください。",
   "88466f5a03be2419": "環境全体の設定です。変更するには環境を選択してください。",
-  "a3538ba5ca802bd7": [
-    {
-      "i": 1,
-      "k": "_gt_value_1",
-      "v": "v"
-    },
-    " を削除しますか？"
-  ],
   "0d5b3b39f92c04e4": "プロバイダーを削除",
   "c52bdbe39649742c": [
     {
@@ -11877,6 +11947,7 @@
   "dd95128501e22145": "キャプチャの点滅",
   "9f5280c955132ee1": "キャプチャのアニメーション",
   "f8d32e19131fd5b3": "エージェント CLI Codex Claude Cursor Grok fx Kiro OpenCode Antigravity Google サインイン サインアウト インストール サブスクリプション インスタンス 認証 API キー モデル 構成 バイナリ パス 構成ディレクトリ CODEX_HOME シャドウホーム エンドポイント 引数 環境変数 表示名 アクセントカラー カスタム お気に入り 非表示 自動圧縮 ネイティブセッション インポート 再開 agents",
+  "776e01384caa6e6e": "mcp connectors servers tools claude oauth",
   "ad371af21e5b4b01": "使用量のプロバイダー",
   "9d9d31a4f3d5ff69": "使用量 ソース CLIProxyAPI CLI プロキシ ハブ クォータ サブスクリプション 上限 管理キー 追加 削除 usage sources",
   "d65fa0946585b245": "テキスト生成",
@@ -12541,6 +12612,16 @@
   "156ff7b625287a1e": "スキップ済みを非表示",
   "69b985b97ab45e6b": "スキップ済み {count} 件を表示",
   "2400254d362de84d": "ワークフローの実行を読み込んでいます…",
+  "cae5c3205c01d062": [
+    {
+      "t": "span",
+      "i": 1,
+      "c": "ワークフローファイルに問題があります。"
+    },
+    " ",
+    "正常に読み込めた最後のバージョンが引き続き実行されます。"
+  ],
+  "ed8ce6ebc73dc12d": "ファイルを開く",
   "145e1f7503ba3b2c": [
     "この環境には、そのリンクの実行はありません。",
     " ",
@@ -12566,16 +12647,6 @@
       "c": "ガイドを読む"
     }
   ],
-  "cae5c3205c01d062": [
-    {
-      "t": "span",
-      "i": 1,
-      "c": "ワークフローファイルに問題があります。"
-    },
-    " ",
-    "正常に読み込めた最後のバージョンが引き続き実行されます。"
-  ],
-  "ed8ce6ebc73dc12d": "ファイルを開く",
   "5d8d278ff828102d": "すべてのワークフロー",
   "39459da07479f482": "エージェント",
   "7741243632056b81": "{step} · トランスクリプト",
@@ -12718,9 +12789,5 @@
   "27d76249d09eb69f": "レビューガイドの準備ができました",
   "faa3bb26abb39c93": "レビューガイドの作成に失敗しました",
   "b7df38b7d8792d78": "ガイドを開く",
-  "9e91e9a77b664e4e": "レビューガイドを開始できませんでした",
-  "99d51127f573296b": "別のアカウント",
-  "8ec2c57414669b79": "2つ目の {tracker} ワークスペースまたはユーザーを接続します。",
-  "99963c0142e17f00": "新しい {tracker} アカウント用です。",
-  "6d8e4ebc889bace9": "アカウントを追加"
+  "9e91e9a77b664e4e": "レビューガイドを開始できませんでした"
 }
