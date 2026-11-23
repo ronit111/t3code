@@ -320,7 +320,7 @@ export const update = (state: ViewState, event: PickerEvent): Update => {
       const profile = findProfile(state, event.id);
       if (profile === undefined) return [state, null];
       const [next] = startForm(state, { _tag: "Rename", id: event.id });
-      return [{ ...next, fields: { name: profile.name ?? strings.defaultName } }, null];
+      return [{ ...next, fields: { name: profile.name ?? "" } }, null];
     }
     case "StartSetPassword":
       return startForm(state, { _tag: "SetPassword", id: event.id });

@@ -405,6 +405,7 @@ function render(): void {
   );
   const target =
     root.querySelector<HTMLElement>('[aria-invalid="true"]') ??
+    root.querySelector<HTMLElement>('[role="menuitem"]') ??
     root.querySelector<HTMLElement>("[data-autofocus]");
   target?.focus();
 }
