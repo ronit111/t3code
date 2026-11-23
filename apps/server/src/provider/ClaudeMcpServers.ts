@@ -310,10 +310,11 @@ const make = Effect.gen(function* () {
         ),
       );
     if (result.code !== 0) {
+      // stdin carries connector secrets; the CLI could echo them back on a parse error.
       yield* Effect.logWarning("claude mcp exited with an error", {
         args: args.slice(0, 2),
         code: result.code,
-        stderr: result.stderr.slice(-2000),
+        stderr: stdin === undefined ? result.stderr.slice(-2000) : "(omitted: input had secrets)",
       });
       return yield* fail("CliFailed", DETAILS.cliFailed);
     }
