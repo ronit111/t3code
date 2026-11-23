@@ -83,6 +83,7 @@ import {
   SquarePenIcon,
   TextSearchIcon,
   UserPlusIcon,
+  UserRoundIcon,
   WorkflowIcon,
 } from "lucide-react";
 import { openThreadFind } from "./chat/threadFindStore";
@@ -328,6 +329,44 @@ function openIntentView(
 
 const NEW_THREAD_NO_PROJECT_VALUE = "new-thread-in:no-project";
 
+/** Present only on macOS desktop with profiles on; absent on web and mobile. */
+function useSwitchProfileItem(): CommandPaletteActionItem | null {
+  const gt = useGT();
+  const profiles = window.desktopBridge?.profiles;
+  const [activeName, setActiveName] = useState<{ readonly name: string | null } | null>(null);
+  // oxlint-disable-next-line t3code/no-unreasoned-state-sync -- reads the active profile from the desktop bridge once per palette session
+  useEffect(() => {
+    if (!profiles) return;
+    let current = true;
+    profiles.getActive().then(
+      ({ name }) => {
+        if (current) setActiveName({ name });
+      },
+      () => {},
+    );
+    return () => {
+      current = false;
+    };
+  }, [profiles]);
+  if (!profiles) return null;
+  return {
+    kind: "action",
+    value: "action:switch-profile",
+    searchTerms: ["profile", "switch", "user", "family", "account"],
+    title: gt("Switch profile..."),
+    description:
+      activeName === null
+        ? undefined
+        : gt("Current profile: {name}", {
+            name: activeName.name ?? gt("Default", { $context: "name of the default profile" }),
+          }),
+    icon: <UserRoundIcon className={ITEM_ICON_CLASS} />,
+    run: async () => {
+      await profiles.switchProfile();
+    },
+  };
+}
+
 export function CommandPalette({ children }: { children: ReactNode }) {
   useCommandPaletteMount();
   const state = useCommandPaletteStore();
@@ -554,6 +593,7 @@ function OpenCommandPaletteDialog(props: {
   const keybindings = useAtomValue(primaryServerKeybindingsAtom);
   const providersByEnvironment = useEnvironmentProviders();
   const { changeThemeItem, changeAppearanceItem, themeEditorItem } = useCommandPaletteThemeItems();
+  const switchProfileItem = useSwitchProfileItem();
   const portForwardItem = useCommandPalettePortForwardItem({
     activeThread: activeThread ?? null,
     query: deferredQuery,
@@ -1678,6 +1718,7 @@ function OpenCommandPaletteDialog(props: {
   actionItems.push(changeAppearanceItem);
 
   actionItems.push(themeEditorItem);
+  if (switchProfileItem) actionItems.push(switchProfileItem);
 
   if (environments.some((environment) => environment.serverConfig !== null)) {
     actionItems.push({
