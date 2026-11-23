@@ -348,7 +348,9 @@ describe("resolveProfileLaunchSync", () => {
   });
 
   it("5.4: a registry with only an unlocked Default opens Default and writes nothing", () => {
-    const { launch, calls } = resolve({ [REGISTRY]: registry([{ id: "default", name: "Travel" }]) });
+    const { launch, calls } = resolve({
+      [REGISTRY]: registry([{ id: "default", name: "Travel" }]),
+    });
     assert.deepEqual<unknown>(launch, {
       _tag: "Open",
       profile: {
