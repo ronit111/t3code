@@ -87,6 +87,18 @@ if (!primaryPasteEnabled) {
   );
 }
 
+let profilesEnabled = false;
+try {
+  profilesEnabled = ipcRenderer.sendSync(IpcChannels.PROFILES_ENABLED_CHANNEL) === true;
+} catch {}
+
+const profiles: DesktopBridge["profiles"] = profilesEnabled
+  ? {
+      getActive: () => ipcRenderer.invoke(IpcChannels.PROFILES_GET_ACTIVE_CHANNEL),
+      switchProfile: () => ipcRenderer.invoke(IpcChannels.PROFILES_SWITCH_CHANNEL),
+    }
+  : undefined;
+
 function unwrapEnsureSshEnvironmentResult(result: unknown) {
   if (
     typeof result === "object" &&
@@ -117,6 +129,7 @@ contextBridge.exposeInMainWorld("desktopBridge", {
   },
   getPathForFile: (file: File) => webUtils.getPathForFile(file),
   getClientPlatform: () => clientPlatform,
+  ...(profiles ? { profiles } : {}),
   restartAudioService: () => ipcRenderer.invoke(IpcChannels.RESTART_AUDIO_SERVICE_CHANNEL),
   setNotificationBadge: (badge) =>
     ipcRenderer.invoke(IpcChannels.SET_NOTIFICATION_BADGE_CHANNEL, badge),
