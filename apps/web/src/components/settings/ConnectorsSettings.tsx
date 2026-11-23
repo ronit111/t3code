@@ -32,6 +32,7 @@ import { Button } from "../ui/button";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "../ui/select";
 import { Skeleton } from "../ui/skeleton";
 import { Switch } from "../ui/switch";
+import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 import { AddConnectorDialog } from "./AddConnectorDialog";
 import { ConnectorSignInDialog } from "./ConnectorSignInDialog";
 import { SettingsPageContainer, SettingsRow, SettingsSection } from "./settingsLayout";
@@ -201,17 +202,28 @@ function InstanceConnectors({
       <SettingsSection
         id={sectionId}
         title={title}
-        headerAction={
-          <div className="flex items-center gap-2">
-            {instancePicker}
-            {canEdit ? (
-              <Button size="xs" variant="outline" onClick={() => setAdding(true)}>
-                <PlusIcon />
+        titleAction={
+          canEdit ? (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    size="icon-xs"
+                    variant="ghost-muted"
+                    onClick={() => setAdding(true)}
+                    aria-label={gt("Add connector")}
+                  >
+                    <PlusIcon />
+                  </Button>
+                }
+              />
+              <TooltipPopup side="top">
                 <T>Add connector</T>
-              </Button>
-            ) : null}
-          </div>
+              </TooltipPopup>
+            </Tooltip>
+          ) : null
         }
+        headerAction={instancePicker}
       >
         {canEdit ? null : (
           <p className="px-4 py-3 text-xs text-muted-foreground">
@@ -234,7 +246,7 @@ function InstanceConnectors({
           status={accountFailure ? <FailureText>{accountFailure}</FailureText> : null}
         />
         {state.servers.length === 0 ? (
-          <p className="px-4 py-3 text-sm text-muted-foreground">
+          <p className="px-3 py-3 text-xs leading-relaxed text-muted-foreground sm:px-4">
             <T>
               No connectors yet. Add one to give this provider's sessions more tools. They live in{" "}
               <Var>{state.configDir}</Var>.
@@ -251,6 +263,16 @@ function InstanceConnectors({
             />
           ))
         )}
+        {canEdit ? (
+          <button
+            type="button"
+            className="flex w-full cursor-pointer items-center gap-3 px-3 py-3 text-left text-sm text-muted-foreground transition-colors outline-none hover:bg-muted/25 hover:text-foreground focus-visible:bg-muted/25 focus-visible:text-foreground sm:px-4"
+            onClick={() => setAdding(true)}
+          >
+            <PlusIcon className="size-4 shrink-0" />
+            <T>Add connector</T>
+          </button>
+        ) : null}
       </SettingsSection>
       <AddConnectorDialog
         open={adding}

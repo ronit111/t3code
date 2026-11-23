@@ -8288,6 +8288,7 @@
   "151b01e2043e1b50": "Vous avez besoin de l’autorisation de gérer les fournisseurs sur {label} pour voir et modifier ses connecteurs.",
   "c1e032a171a3892d": "Le T3 Code de cet environnement n’a pas de connecteurs.",
   "7f676d6d09df1795": "Les connecteurs ne sont pas disponibles",
+  "30eccd67b616b8e7": "Ajouter le connecteur",
   "ef4077144bd24fac": "Connecteurs du compte (claude.ai)",
   "317778ac0d161476": "Lorsque cette option est activée, les sessions reçoivent aussi les connecteurs configurés sur claude.ai pour cet abonnement, que voient toutes les personnes qui l’utilisent. S’applique aux nouvelles sessions.",
   "e69858b7f84f5a73": "Utilise : {names}",

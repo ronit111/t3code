@@ -135,19 +135,31 @@ function h<K extends keyof HTMLElementTagNameMap>(
   return element;
 }
 
-const lockIcon = () => {
+// Lucide paths (lock, ellipsis, plus), drawn here because the page loads no assets.
+const ICONS = {
+  lock: [
+    ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2" }],
+    ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4" }],
+  ],
+  more: [
+    ["circle", { cx: "12", cy: "12", r: "1" }],
+    ["circle", { cx: "19", cy: "12", r: "1" }],
+    ["circle", { cx: "5", cy: "12", r: "1" }],
+  ],
+  plus: [["path", { d: "M5 12h14M12 5v14" }]],
+} satisfies Record<string, ReadonlyArray<readonly [string, Record<string, string>]>>;
+
+const icon = (name: keyof typeof ICONS) => {
   const ns = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(ns, "svg");
-  svg.setAttribute("viewBox", "0 0 12 12");
-  svg.setAttribute("class", "lock");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("class", "icon");
   svg.setAttribute("aria-hidden", "true");
-  const path = document.createElementNS(ns, "path");
-  path.setAttribute(
-    "d",
-    "M3.5 5V3.5a2.5 2.5 0 0 1 5 0V5H9a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h.5Zm1 0h3V3.5a1.5 1.5 0 0 0-3 0V5Z",
-  );
-  path.setAttribute("fill", "currentColor");
-  svg.append(path);
+  for (const [tag, attributes] of ICONS[name]) {
+    const node = document.createElementNS(ns, tag);
+    for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+    svg.append(node);
+  }
   return svg;
 };
 
@@ -253,9 +265,12 @@ function renderRow(strings: PickerStrings, profile: ProfileSummary): HTMLElement
           disabled: state.busy,
         },
         [
+          h("span", { class: "avatar", "aria-hidden": "true" }, [
+            Array.from(profileName(strings, profile))[0]?.toLocaleUpperCase() ?? "",
+          ]),
           h("span", { class: "row-name" }, [profileName(strings, profile)]),
-          profile.locked ? lockIcon() : null,
-          profile.lastUsed ? h("span", { class: "tag" }, [strings.lastUsed]) : null,
+          profile.locked ? icon("lock") : null,
+          profile.lastUsed ? h("span", { class: "badge" }, [strings.lastUsed]) : null,
         ],
         { click: () => dispatch({ _tag: "RowClicked", id: profile.id }) },
       ),
@@ -269,7 +284,7 @@ function renderRow(strings: PickerStrings, profile: ProfileSummary): HTMLElement
           "aria-expanded": menuOpen ? "true" : "false",
           disabled: state.busy,
         },
-        ["⋯"],
+        [icon("more")],
         { click: () => dispatch({ _tag: "ToggleMenu", id: profile.id }) },
       ),
     ]),
@@ -293,7 +308,7 @@ function renderList(strings: PickerStrings): ReadonlyArray<Child> {
     ),
     listError,
     h("div", { class: "actions" }, [
-      h("button", { type: "button", disabled: state.busy }, [strings.addProfile], {
+      h("button", { type: "button", disabled: state.busy }, [icon("plus"), strings.addProfile], {
         click: () => dispatch({ _tag: "StartAdd" }),
       }),
     ]),
@@ -341,7 +356,7 @@ function renderScreen(strings: PickerStrings): ReadonlyArray<Child> {
       return [];
     case "Blocked":
       return [
-        h("p", { role: "alert" }, [strings.registryUnreadable]),
+        h("p", { role: "alert", class: "banner alert" }, [strings.registryUnreadable]),
         h("div", { class: "actions" }, [
           h("button", { type: "button" }, [strings.showFile], {
             click: () => dispatch({ _tag: "RevealRegistry" }),
@@ -408,6 +423,12 @@ function render(): void {
     root.querySelector<HTMLElement>('[role="menuitem"]') ??
     root.querySelector<HTMLElement>("[data-autofocus]");
   target?.focus();
+  // The menu opens upward when it would run past the window and there is room above.
+  const menu = root.querySelector<HTMLElement>(".menu");
+  if (menu !== null) {
+    const { top, bottom, height } = menu.getBoundingClientRect();
+    if (bottom > window.innerHeight - 8 && top - height - 52 > 40) menu.classList.add("up");
+  }
 }
 
 window.addEventListener("DOMContentLoaded", () => {

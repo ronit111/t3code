@@ -4,6 +4,8 @@ import * as Layer from "effect/Layer";
 import * as Electron from "electron";
 import { msg } from "gt-i18n";
 
+import * as HostProcess from "@t3tools/shared/HostProcess";
+
 import * as ElectronApp from "../../electron/ElectronApp.ts";
 import { applyLanguage, m } from "../../i18n/messages.ts";
 import type { PickerLaunch, ProfileService } from "../ProfileContract.ts";
@@ -64,14 +66,20 @@ const program = Effect.fn("DesktopProfiles.pickerProgram")(function* (
   // The picker reads nothing from a profile home, so it follows the system language.
   yield* applyLanguage("system");
   setPickerMenu();
+  const platform = yield* HostProcess.Platform;
 
   const window = new Electron.BrowserWindow({
     width: 480,
-    height: 560,
+    height: 520,
     resizable: false,
     maximizable: false,
     fullscreenable: false,
     show: false,
+    // Matches the page canvas (zinc-25 or black) so the window never flashes the other theme.
+    backgroundColor: Electron.nativeTheme.shouldUseDarkColors ? "#000000" : "#fcfcfc",
+    ...(platform === "darwin"
+      ? { titleBarStyle: "hiddenInset" as const, trafficLightPosition: { x: 16, y: 16 } }
+      : {}),
     title: pickerStrings(launch.notice).windowTitle,
     webPreferences: {
       preload: `${__dirname}/${PICKER_PRELOAD}`,

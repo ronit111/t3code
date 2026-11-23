@@ -8287,6 +8287,7 @@
   "151b01e2043e1b50": "Você precisa de permissão para gerenciar provedores em {label} para ver e alterar os conectores dele.",
   "c1e032a171a3892d": "O T3 Code deste ambiente não tem Conectores.",
   "7f676d6d09df1795": "Os conectores não estão disponíveis",
+  "30eccd67b616b8e7": "Adicionar conector",
   "ef4077144bd24fac": "Conectores da conta (claude.ai)",
   "317778ac0d161476": "Quando ativado, as sessões também recebem os conectores configurados no claude.ai para esta assinatura, que todos que usam a assinatura veem. Vale para as novas sessões.",
   "e69858b7f84f5a73": "Usa: {names}",

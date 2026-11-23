@@ -8293,6 +8293,7 @@
   "151b01e2043e1b50": "Du behöver behörighet att hantera leverantörer på {label} för att se och ändra dess kopplingar.",
   "c1e032a171a3892d": "T3 Code i den här miljön har inga kopplingar.",
   "7f676d6d09df1795": "Kopplingar är inte tillgängliga",
+  "30eccd67b616b8e7": "Lägg till koppling",
   "ef4077144bd24fac": "Kontokopplingar (claude.ai)",
   "317778ac0d161476": "När det är på får sessioner också de kopplingar som är inställda på claude.ai för den här prenumerationen, som alla som använder prenumerationen ser. Gäller nya sessioner.",
   "e69858b7f84f5a73": "Använder: {names}",

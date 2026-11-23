@@ -8289,6 +8289,7 @@
   "151b01e2043e1b50": "Du brauchst die Berechtigung, Anbieter auf {label} zu verwalten, um dessen Konnektoren zu sehen und zu ändern.",
   "c1e032a171a3892d": "Das T3 Code dieser Umgebung hat keine Konnektoren.",
   "7f676d6d09df1795": "Konnektoren sind nicht verfügbar",
+  "30eccd67b616b8e7": "Konnektor hinzufügen",
   "ef4077144bd24fac": "Konto-Konnektoren (claude.ai)",
   "317778ac0d161476": "Wenn aktiviert, erhalten Sitzungen auch die Konnektoren, die auf claude.ai für dieses Abonnement eingerichtet sind und die alle sehen, die das Abonnement nutzen. Gilt für neue Sitzungen.",
   "e69858b7f84f5a73": "Verwendet: {names}",
