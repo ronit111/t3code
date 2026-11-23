@@ -221,6 +221,18 @@ import {
   ThreadIssueKey,
 } from "./issue.ts";
 import {
+  ClaudeConnectorsAddInput,
+  ClaudeConnectorsError,
+  ClaudeConnectorsListInput,
+  ClaudeConnectorsNamedInput,
+  ClaudeConnectorsSetAccountConnectorsInput,
+  ClaudeConnectorsSignInCancelInput,
+  ClaudeConnectorsSignInCompleteInput,
+  ClaudeConnectorsSignInCompleteResult,
+  ClaudeConnectorsSignInStartResult,
+  ClaudeConnectorsState,
+} from "./claudeConnectors.ts";
+import {
   GuestShareCreateError,
   GuestShareCreateInput,
   GuestShareCreateResult,
@@ -518,6 +530,14 @@ export const WS_METHODS = {
   providerUploadFeedback: "provider.uploadFeedback",
   providerMcpSignInStart: "provider.mcpSignIn.start",
   providerMcpSignInComplete: "provider.mcpSignIn.complete",
+  claudeConnectorsList: "claudeConnectors.list",
+  claudeConnectorsAdd: "claudeConnectors.add",
+  claudeConnectorsRemove: "claudeConnectors.remove",
+  claudeConnectorsSetAccountConnectors: "claudeConnectors.setAccountConnectors",
+  claudeConnectorsSignInStart: "claudeConnectors.signIn.start",
+  claudeConnectorsSignInComplete: "claudeConnectors.signIn.complete",
+  claudeConnectorsSignInCancel: "claudeConnectors.signIn.cancel",
+  claudeConnectorsSignOut: "claudeConnectors.signOut",
   providerAuthStart: "provider.auth.start",
   providerConsumeResetCredit: "provider.consumeResetCredit",
   providerAuthComplete: "provider.auth.complete",
@@ -1808,6 +1828,63 @@ const WsProviderMcpSignInCompleteRpc = Rpc.make(WS_METHODS.providerMcpSignInComp
   error: Schema.Union([ProviderMcpSignInError, EnvironmentAuthorizationError]),
 });
 
+const ClaudeConnectorsRpcError = Schema.Union([
+  ClaudeConnectorsError,
+  EnvironmentAuthorizationError,
+]);
+
+/** The instance's user-scope MCP servers, read from its account config file without starting them. */
+const WsClaudeConnectorsListRpc = Rpc.make(WS_METHODS.claudeConnectorsList, {
+  payload: ClaudeConnectorsListInput,
+  success: ClaudeConnectorsState,
+  error: ClaudeConnectorsRpcError,
+});
+
+const WsClaudeConnectorsAddRpc = Rpc.make(WS_METHODS.claudeConnectorsAdd, {
+  payload: ClaudeConnectorsAddInput,
+  success: ClaudeConnectorsState,
+  error: ClaudeConnectorsRpcError,
+});
+
+const WsClaudeConnectorsRemoveRpc = Rpc.make(WS_METHODS.claudeConnectorsRemove, {
+  payload: ClaudeConnectorsNamedInput,
+  success: ClaudeConnectorsState,
+  error: ClaudeConnectorsRpcError,
+});
+
+const WsClaudeConnectorsSetAccountConnectorsRpc = Rpc.make(
+  WS_METHODS.claudeConnectorsSetAccountConnectors,
+  {
+    payload: ClaudeConnectorsSetAccountConnectorsInput,
+    success: ClaudeConnectorsState,
+    error: ClaudeConnectorsRpcError,
+  },
+);
+
+const WsClaudeConnectorsSignInStartRpc = Rpc.make(WS_METHODS.claudeConnectorsSignInStart, {
+  payload: ClaudeConnectorsNamedInput,
+  success: ClaudeConnectorsSignInStartResult,
+  error: ClaudeConnectorsRpcError,
+});
+
+const WsClaudeConnectorsSignInCompleteRpc = Rpc.make(WS_METHODS.claudeConnectorsSignInComplete, {
+  payload: ClaudeConnectorsSignInCompleteInput,
+  success: ClaudeConnectorsSignInCompleteResult,
+  error: ClaudeConnectorsRpcError,
+});
+
+const WsClaudeConnectorsSignInCancelRpc = Rpc.make(WS_METHODS.claudeConnectorsSignInCancel, {
+  payload: ClaudeConnectorsSignInCancelInput,
+  success: Schema.Void,
+  error: ClaudeConnectorsRpcError,
+});
+
+const WsClaudeConnectorsSignOutRpc = Rpc.make(WS_METHODS.claudeConnectorsSignOut, {
+  payload: ClaudeConnectorsNamedInput,
+  success: ClaudeConnectorsState,
+  error: ClaudeConnectorsRpcError,
+});
+
 const WsSubscribeVcsBranchRpc = Rpc.make(WS_METHODS.subscribeVcsBranch, {
   payload: VcsStatusInput,
   success: VcsBranchStatus,
@@ -2473,6 +2550,14 @@ export const WsRpcGroup = RpcGroup.make(
   WsIssueTrackersListRpc,
   WsIssueTrackersConnectRpc,
   WsIssueTrackersBindProjectRpc,
+  WsClaudeConnectorsListRpc,
+  WsClaudeConnectorsAddRpc,
+  WsClaudeConnectorsRemoveRpc,
+  WsClaudeConnectorsSetAccountConnectorsRpc,
+  WsClaudeConnectorsSignInStartRpc,
+  WsClaudeConnectorsSignInCompleteRpc,
+  WsClaudeConnectorsSignInCancelRpc,
+  WsClaudeConnectorsSignOutRpc,
   WsGuestShareCreateRpc,
   WsServerProbeRpc,
   WsServerGetConfigRpc,
