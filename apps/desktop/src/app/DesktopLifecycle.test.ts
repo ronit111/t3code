@@ -1,6 +1,8 @@
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, describe, it } from "@effect/vitest";
 import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
+import * as FileSystem from "effect/FileSystem";
 import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
 import * as Ref from "effect/Ref";
@@ -18,6 +20,7 @@ import * as DesktopLifecycle from "./DesktopLifecycle.ts";
 import * as DesktopShutdown from "./DesktopShutdown.ts";
 import * as DesktopState from "./DesktopState.ts";
 import * as DesktopWindow from "../window/DesktopWindow.ts";
+import type { ActiveProfile, LaunchIntentTarget, ProfileId } from "../profiles/ProfileContract.ts";
 
 function layerElectronApp(
   appListeners: Map<string, (...args: readonly unknown[]) => void>,
@@ -109,6 +112,107 @@ function layerDesktopWindow(
   });
 }
 
+const profileOff: ActiveProfile = {
+  id: "default" as ProfileId,
+  name: null,
+  isDefault: true,
+  profilesRoot: null,
+  registryExists: false,
+};
+
+const relaunchIn = (input: {
+  readonly profile: (root: string) => ActiveProfile;
+  readonly intent?: LaunchIntentTarget;
+}) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem;
+    const root = `${yield* fs.makeTempDirectoryScoped({ prefix: "t3-lifecycle-profiles-" })}/root`;
+    const relaunched = yield* Deferred.make<Electron.RelaunchOptions>();
+    const layer = DesktopLifecycle.layer.pipe(
+      Layer.provideMerge(
+        layerElectronApp(
+          new Map(),
+          Effect.void,
+          () => Effect.void,
+          (options) => Deferred.succeed(relaunched, options).pipe(Effect.asVoid),
+        ),
+      ),
+      Layer.provideMerge(layerElectronTheme),
+      Layer.provideMerge(layerElectronWindow()),
+      Layer.provideMerge(layerDesktopWindow()),
+      Layer.provideMerge(
+        Layer.succeed(DesktopEnvironment.DesktopEnvironment, {
+          platform: "darwin",
+          isDevelopment: false,
+          profile: input.profile(root),
+        } as DesktopEnvironment.DesktopEnvironment["Service"]),
+      ),
+      Layer.provideMerge(DesktopShutdown.layer),
+      Layer.provideMerge(DesktopState.layer),
+      Layer.provideMerge(NodeServices.layer),
+    );
+    const options = yield* Effect.gen(function* () {
+      const lifecycle = yield* DesktopLifecycle.DesktopLifecycle;
+      yield* (yield* DesktopShutdown.DesktopShutdown).markComplete;
+      yield* lifecycle.relaunch("test", input.intent);
+      return yield* Deferred.await(relaunched);
+    }).pipe(
+      Effect.provide(layer),
+      Effect.provideService(HostProcess.ExecutablePath, "/Applications/T3 Code.app/T3 Code"),
+      Effect.provideService(HostProcess.Arguments, [
+        "/Applications/T3 Code.app/T3 Code",
+        "--t3-profile=pa1b2c3d4e5",
+        "--inspect",
+        "--t3-profile-picker",
+      ]),
+    );
+    const intentPath = `${root}/launch-intent.json`;
+    const intent = (yield* fs.exists(intentPath))
+      ? (JSON.parse(yield* fs.readFileString(intentPath)) as { readonly target: unknown })
+      : null;
+    return { options, intent: intent?.target ?? null, rootExists: yield* fs.exists(root) };
+  }).pipe(Effect.scoped, Effect.provide(NodeServices.layer));
+
+describe("DesktopLifecycle.relaunch with profiles", () => {
+  const P1 = "pa1b2c3d4e5" as ProfileId;
+  const expectedArgs = { execPath: "/Applications/T3 Code.app/T3 Code", args: ["--inspect"] };
+
+  it.effect("relaunch without a registry writes nothing and forwards today's args", () =>
+    Effect.gen(function* () {
+      const result = yield* relaunchIn({
+        profile: (root) => ({ ...profileOff, profilesRoot: root }),
+      });
+      assert.deepEqual(result, { options: expectedArgs, intent: null, rootExists: false });
+    }),
+  );
+
+  it.effect("relaunch with a registry reopens the current profile", () =>
+    Effect.gen(function* () {
+      const result = yield* relaunchIn({
+        profile: (root) => ({
+          id: P1,
+          name: "Work",
+          isDefault: false,
+          profilesRoot: root,
+          registryExists: true,
+        }),
+      });
+      assert.deepEqual(result.options, expectedArgs);
+      assert.deepEqual(result.intent, { kind: "profile", profileId: P1, unlocked: true });
+    }),
+  );
+
+  it.effect("an explicit intent wins, even without a registry", () =>
+    Effect.gen(function* () {
+      const result = yield* relaunchIn({
+        profile: (root) => ({ ...profileOff, profilesRoot: root }),
+        intent: { kind: "picker" },
+      });
+      assert.deepEqual(result.intent, { kind: "picker" });
+    }),
+  );
+});
+
 describe("DesktopLifecycle", () => {
   it.effect.each(["darwin", "win32", "linux"] satisfies ReadonlyArray<NodeJS.Platform>)(
     "lets the updater's quit event proceed on %s",
@@ -135,6 +239,7 @@ describe("DesktopLifecycle", () => {
         Layer.provideMerge(layerEnvironment),
         Layer.provideMerge(DesktopShutdown.layer),
         Layer.provideMerge(DesktopState.layer),
+        Layer.provideMerge(NodeServices.layer),
       );
 
       return Effect.scoped(
@@ -207,6 +312,7 @@ describe("DesktopLifecycle", () => {
         Layer.provideMerge(layerEnvironment),
         Layer.provideMerge(layerDesktopShutdown),
         Layer.provideMerge(DesktopState.layer),
+        Layer.provideMerge(NodeServices.layer),
       );
 
       yield* Effect.scoped(
@@ -235,6 +341,7 @@ describe("DesktopLifecycle", () => {
       const layerEnvironment = Layer.succeed(DesktopEnvironment.DesktopEnvironment, {
         platform: "linux",
         isDevelopment: false,
+        profile: profileOff,
       } as DesktopEnvironment.DesktopEnvironment["Service"]);
       const layer = DesktopLifecycle.layer.pipe(
         Layer.provideMerge(
@@ -251,6 +358,7 @@ describe("DesktopLifecycle", () => {
         Layer.provideMerge(layerEnvironment),
         Layer.provideMerge(DesktopShutdown.layer),
         Layer.provideMerge(DesktopState.layer),
+        Layer.provideMerge(NodeServices.layer),
       );
 
       const options = yield* Effect.gen(function* () {
@@ -294,6 +402,7 @@ describe("DesktopLifecycle", () => {
         // Nothing marks this shutdown complete, so it stays pending.
         Layer.provideMerge(DesktopShutdown.layer),
         Layer.provideMerge(DesktopState.layer),
+        Layer.provideMerge(NodeServices.layer),
       );
 
       yield* Effect.scoped(
@@ -346,6 +455,7 @@ describe("DesktopLifecycle", () => {
         Layer.provideMerge(layerEnvironment),
         Layer.provideMerge(DesktopShutdown.layer),
         Layer.provideMerge(DesktopState.layer),
+        Layer.provideMerge(NodeServices.layer),
       );
 
       yield* Effect.scoped(

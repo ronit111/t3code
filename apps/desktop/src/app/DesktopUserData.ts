@@ -1,5 +1,6 @@
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
+import * as Option from "effect/Option";
 import * as Path from "effect/Path";
 import * as PlatformError from "effect/PlatformError";
 import * as Schema from "effect/Schema";
@@ -36,7 +37,15 @@ export const resolveUserDataPath = Effect.fn("desktop.userData.resolveUserDataPa
     readonly appDataDirectory: string;
     readonly isDevelopment: boolean;
     readonly platform: NodeJS.Platform;
+    readonly electronUserDataOverride?: Option.Option<string>;
   }) {
+    // A non-Default profile has its own userData; none of the legacy migration applies to it.
+    if (
+      input.electronUserDataOverride !== undefined &&
+      Option.isSome(input.electronUserDataOverride)
+    ) {
+      return input.electronUserDataOverride.value;
+    }
     const fs = yield* FileSystem.FileSystem;
     const path = yield* Path.Path;
     const names = input.isDevelopment

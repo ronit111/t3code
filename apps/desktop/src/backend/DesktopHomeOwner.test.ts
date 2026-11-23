@@ -96,6 +96,26 @@ describe("DesktopHomeOwner.readLiveHomeOwner", () => {
   );
 });
 
+describe("DesktopHomeOwner.isStateDirOwned", () => {
+  it.effect("matches the desktop's own ownership probe for the same folder", () =>
+    withTempHome((userdata) =>
+      Effect.gen(function* () {
+        assert.isFalse(yield* DesktopHomeOwner.isStateDirOwned(userdata));
+        assert.isTrue(yield* DesktopHomeOwner.awaitHomeOwnershipRelease());
+
+        const held = new NodeSqlite.DatabaseSync(`${userdata}/server-owner.sqlite`);
+        held.exec("BEGIN EXCLUSIVE;");
+        assert.isTrue(yield* DesktopHomeOwner.isStateDirOwned(userdata));
+        const owned = yield* Effect.forkChild(DesktopHomeOwner.awaitHomeOwnershipRelease());
+        yield* TestClock.adjust("1 minute");
+        assert.isFalse(yield* Fiber.join(owned));
+        held.close();
+        assert.isFalse(yield* DesktopHomeOwner.isStateDirOwned(userdata));
+      }),
+    ),
+  );
+});
+
 describe("DesktopHomeOwner.awaitHomeOwnershipRelease", () => {
   it.effect("waits for a shutting-down owner to release the lock, then gives up", () =>
     withTempHome((userdata) =>

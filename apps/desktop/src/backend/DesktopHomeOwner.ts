@@ -39,9 +39,10 @@ const isProcessAlive = (pid: number): boolean => {
  * Whether a server holds the T3 home's ownership lock (an exclusive transaction on
  * `server-owner.sqlite`). A read-only read is refused with SQLITE_BUSY only while it is held.
  */
-const isHomeOwnershipLocked = Effect.fn("DesktopHomeOwner.isHomeOwnershipLocked")(function* () {
+export const isStateDirOwned = Effect.fn("DesktopHomeOwner.isStateDirOwned")(function* (
+  stateDir: string,
+) {
   const path = yield* Path.Path;
-  const { stateDir } = yield* DesktopEnvironment.DesktopEnvironment;
   const lockPath = path.join(stateDir, "server-owner.sqlite");
   return yield* Effect.sync(() => {
     try {
@@ -58,6 +59,11 @@ const isHomeOwnershipLocked = Effect.fn("DesktopHomeOwner.isHomeOwnershipLocked"
       return cause instanceof Error && "errcode" in cause && cause.errcode === 5;
     }
   });
+});
+
+const isHomeOwnershipLocked = Effect.fn("DesktopHomeOwner.isHomeOwnershipLocked")(function* () {
+  const { stateDir } = yield* DesktopEnvironment.DesktopEnvironment;
+  return yield* isStateDirOwned(stateDir);
 });
 
 // A quitting app's backend holds the lock until it exits, which can outlast the relaunch of an update.
